@@ -1,0 +1,73 @@
+---
+title: "Longitudinal Data"
+author: "Eric R. Scott"
+date: "2021-06-02"
+output: 
+  html_notebook: 
+    highlight: kate
+    theme: yeti
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(conflicted)
+library(lubridate)
+library(patchwork)
+library(lme4)
+
+conflict_prefer("lag", "dplyr")
+conflict_prefer("filter", "dplyr")
+```
+
+*Last compiled: `r Sys.Date()`*
+
+# Purpose
+
+What is the goal of this notebook?
+
+# Load Data
+
+```{r data, echo=TRUE}
+longdata <- read_rds(here("data", "clean_data", "longdata.rds"))
+```
+
+## Data Dictionary
+
+Use `df_dict(df)` to automatically insert a template markdown data dictionary at the location of your cursor
+
+
+# Analysis
+
+Figure 2:
+As facets:
+
+```{r}
+ggplot(longdata, aes(x = date, y = height)) +
+  stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line") +
+  facet_wrap(~plant_species, scales = "free_y", ncol = 1) +
+  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d", limits = date_range) +
+  scale_y_continuous("Height (cm)") +
+  scale_color_discrete("Historical") +
+  scale_linetype_discrete("Current") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+# Models
+```{r}
+long_list <-
+  longdata %>%
+  group_by(plant_species) %>%
+  group_split()
+
+beans <- long_list[[1]]
+m <- lmer(height ~ days + hist_treat*curr_treat + (1|plot) + (1|plot/pot), data = beans)
+performance::check_model(m)
+```
+
+

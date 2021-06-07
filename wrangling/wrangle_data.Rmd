@@ -62,7 +62,8 @@ longdata_done <-
   mutate(plant_species = fct_recode(plant_species, kale = "k", beans = "b", oats = "o")) %>% 
   mutate(curr_treat = fct_recode(curr_treat, "ambient" = "0", "75%" = "25", "50%" = "50"),
          hist_treat = fct_recode(hist_treat, "high" = "0", "medium" = "25", "low" = "50")) %>% 
-  mutate(plant_id = glue::glue("{plant_species}_plot{plot}_{hist_treat}_pot{pot}_{plant}"))
+  mutate(plant_id = glue::glue("{plant_species}_plot{plot}_{hist_treat}_pot{pot}_{plant}")) %>% 
+  rename(species = plant_species)
 
 # longdata_done %>% count(plant_id)
 ```
@@ -74,7 +75,7 @@ write_rds(longdata_done, here("data", "clean_data", "longdata.rds"))
 ```
 
 
-## Mid-season Harvest
+# Mid-season Harvest
 
 This excel workbook has hidden tabs and formulas.
 I'm going to mostly trust them and go with the tabs that were shown rather than re-calculating things for now.
@@ -101,6 +102,7 @@ july_harvest <-
     select(id, species, hist, curr, plot, pot, everything())
 july_harvest
 ```
+SPAD is "a no go"  wildly different values depending on whether it was raining or not.
 
 ```{r}
 #plants that didn't get harvested I guess??
@@ -129,6 +131,9 @@ oats_harvest <-
   mutate(across(n:zn, ~str_remove(.x, "<"))) %>% 
   mutate(across(n:grainharvest, ~as.numeric(.x)))
 ```
+Harvest was not super reliable because of dehiscence and lost beans and oats. Focus only on chemistry here.
+
+
 
 Repeat for beans and kale
 

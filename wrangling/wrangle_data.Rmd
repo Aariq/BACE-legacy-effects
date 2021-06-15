@@ -59,15 +59,39 @@ recode variables.  For historical treatment, 0 = high moisture, 25 = medium mois
 ```{r}
 longdata_done <-
   longdata_2 %>% 
-  mutate(plant_species = fct_recode(plant_species, kale = "k", beans = "b", oats = "o")) %>% 
-  mutate(curr_treat = fct_recode(curr_treat, "ambient" = "0", "75%" = "25", "50%" = "50"),
-         hist_treat = fct_recode(hist_treat, "high" = "0", "medium" = "25", "low" = "50")) %>% 
-  mutate(plant_id = glue::glue("{plant_species}_plot{plot}_{hist_treat}_pot{pot}_{plant}")) %>% 
+  mutate(plant_species = fct_recode(
+    plant_species,
+    kale = "k",
+    beans = "b",
+    oats = "o"
+  )) %>%
+  mutate(
+    curr_treat = fct_recode(
+      curr_treat,
+      "ambient" = "0",
+      "75%" = "25",
+      "50%" = "50"
+    ),
+    hist_treat = fct_recode(
+      hist_treat,
+      "high" = "0",
+      "medium" = "25",
+      "low" = "50"
+    )
+  ) %>%
+  #make unique pot and plant IDs
+  mutate(
+    pot_id = glue::glue(
+      "{plant_species}_plot{plot}_{hist_treat}_pot{pot}"
+    ),
+    plant_id = glue::glue(
+      "{pot_id}_{plant}"
+    )
+  ) %>%
   rename(species = plant_species)
 
 # longdata_done %>% count(plant_id)
 ```
-
 
 
 ```{r}

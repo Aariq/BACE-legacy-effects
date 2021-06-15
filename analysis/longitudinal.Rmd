@@ -43,11 +43,9 @@ longdata <- read_rds(here("data", "clean_data", "longdata.rds"))
 
 Use `df_dict(df)` to automatically insert a template markdown data dictionary at the location of your cursor
 
-
 # Analysis
 
-Figure 2:
-As facets:
+Figure 2: As facets:
 
 ```{r}
 ggplot(longdata, aes(x = date, y = height)) +
@@ -61,9 +59,12 @@ ggplot(longdata, aes(x = date, y = height)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
 # Determine cutoffs
 
-Kale continues growing throughout the season, but beans and oats both stop growing after a few weeks.  I think it is reasonable to just "eyeball" the point at which they stop growing, and look at growth rates before that point  (the alternative would be a logistic or changepoint model---logistic might be worth looking into).  Then, I'll calculate a daily growth to hopefully reduce heteroskedasticity and remove "week" from the model, thus simplifying it.
+Kale continues growing throughout the season, but beans and oats both stop growing after a few weeks.
+I think it is reasonable to just "eyeball" the point at which they stop growing, and look at growth rates before that point (the alternative would be a logistic or changepoint model---[logistic](https://bscheng.com/2014/05/07/modeling-logistic-growth-data-in-r/) might be worth looking into).
+Then, I'll calculate a daily growth to hopefully reduce heteroskedasticity and remove "week" from the model, thus simplifying it.
 
 ```{r}
 #split data
@@ -71,7 +72,6 @@ beans <- longdata %>% filter(species == "beans")
 kale <- longdata %>% filter(species == "kale")
 oats <- longdata %>% filter(species == "oats")
 ```
-
 
 ## Beans
 
@@ -85,6 +85,7 @@ ggplot(beans, aes(x = date, y = height)) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
 Looks like 7/31 would be a good cutoff.
 
 ```{r}
@@ -103,6 +104,7 @@ ggplot(oats, aes(x = date, y = height)) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
 Less clear for oats---it seems like the end of growth depends on the treatment with oats in current dry conditions not really leveling off in size until the very end and in current ambient conditions growth is leveling off by 8/07.
 
 # Growth rate
@@ -127,20 +129,26 @@ ggplot(longdata_2, aes(y = growth, x = date, color = hist_treat, linetype = curr
 ggplot(longdata_2, aes(growth)) + geom_histogram() + facet_wrap(~species)
 
 ```
-raw data is pretty normally distributed, but growth clearly depends on date for beans and oats.  So seems like some cutoffs would be useful if the goal is really to get rid of "date" as a co-variate.  Could just include date and deal with 3-way interaction?  Could look into timeseries methods?
 
-I think it might be best to go from after initial herbivory (ask when `july_herbivory_count` happened) to just before growth levels off for **all treatments**.  Then say, oats and beans showed logistic growth patterns, but we were only interested in the linear growth phase and in final heights.
+raw data is pretty normally distributed, but growth clearly depends on date for beans and oats.
+So seems like some cutoffs would be useful if the goal is really to get rid of "date" as a co-variate.
+Could just include date and deal with 3-way interaction?
+Could look into timeseries methods?
 
-One set of models for growth ~ curr_treat*hist_treat + july_herbivory_count
+I think it might be best to go from after initial herbivory (ask when `july_herbivory_count` happened) to just before growth levels off for **all treatments**.
+Then say, oats and beans showed logistic growth patterns, but we were only interested in the linear growth phase and in final heights.
 
-then with final harvest data do mass ~ . or final_heigth ~ .
+One set of models for growth \~ curr_treat\*hist_treat + july_herbivory_count
 
+then with final harvest data do mass \~ .
+or final_heigth \~ .
 
 # Models
+
 ```{r}
 long_list <-
-  longdata %>%
-  group_by(plant_species) %>%
+  longdata_2 %>%
+  group_by(species) %>%
   group_split()
 
 beans <- long_list[[1]]
@@ -150,19 +158,90 @@ oats <- long_list[[3]]
 
 start with kale because it keeps growing the whole time
 
+## Height & time
+
 ```{r}
-m <- lmer(growth ~ hist_treat*curr_treat + herbivory + (1|plot) + (1|pot:plot), 
-          data = kale)
+hist(kale$height) #nonnormal
+hist(log(kale$height)) #normal except for a few small values
 
+m_ht <-
+  lmer(
+    log(height) ~ days*hist_treat*curr_treat + july_herbivory_count +
+      (1|plot_id) + (1|pot_id),
+    data = kale
+  )
 
-check_normality(m)
-performance::check_heteroscedasticity(m)
-performance::check_model(m, check = c("linearity", "qq", "normality", "homogeneity"))
+check_normality(m_ht)
+performance::check_heteroscedasticity(m_ht)
+performance::check_model(m_ht, check = c("linearity", "qq", "normality", "homogeneity"))
+```
+
+Check for significance of random effects
+
+```{r}
+m2 <- update(m_ht, .~. - (1|pot_id))
+m3 <- update(m_ht, .~. -(1|plot_id))
+bbmle::AICtab(m_ht, m2, m3)
+```
+
+pot ID, but not plot ID significant.
+Might as well keep both though.
+
+```{r}
+car::Anova(m_ht)
+```
+
+Not very satisfying results, difficult to interpret
+
+## Growth
+```{r}
+hist(kale$growth) #leptokurtic
+```
+
+```{r}
+m_gr <- 
+  lmer(
+    growth ~ hist_treat*curr_treat + july_herbivory_count +
+      (1|plot_id) + (1|pot_id), 
+    data = kale
+  )
+summary(m_gr) #plot ID non significant again, variance = 0
 ```
 
 
 ```{r}
-car::Anova(m)
+check_normality(m_gr)
+performance::check_heteroscedasticity(m_gr)
+performance::check_model(m_gr, check = c("linearity", "qq", "normality", "homogeneity"))
 ```
 
+Not worried about homogeneity of variance, but kurtosis is real bad.
+
+```{r}
+car::Anova(m_gr)
+```
+
+## Growth with family = scat
+The Scaled t family is appropriate for leptokurtic distributions, but only available in `mgcv::gam()` as far as I know. Fortunately, `gam()` can fit random effects.
+
+```{r}
+library(mgcv)
+library(gratia)
+gam_gr <-
+  mgcv::gam(growth ~ hist_treat*curr_treat + july_herbivory_count +
+              s(plot_id, bs = "re") + s(pot_id, bs = "re"),
+      data = kale %>% filter(!is.na(growth)),
+      family = scat)
+
+AIC(gam_gr, m_gr)
+
+gratia::appraise(gam_gr)
+```
+seems better
+
+```{r}
+anova(gam_gr)
+```
+
+nothing significant.
 

@@ -81,13 +81,17 @@ longdata_done <-
   ) %>%
   #make unique pot and plant IDs
   mutate(
+    plot_id = glue::glue(
+      "{plant_species}_plot{plot}_{hist_treat}"
+    ),
     pot_id = glue::glue(
-      "{plant_species}_plot{plot}_{hist_treat}_pot{pot}"
+      "{plot_id}_pot{pot}"
     ),
     plant_id = glue::glue(
       "{pot_id}_{plant}"
     )
   ) %>%
+  mutate(across(ends_with("_id"), as.factor)) %>% 
   rename(species = plant_species)
 
 # longdata_done %>% count(plant_id)

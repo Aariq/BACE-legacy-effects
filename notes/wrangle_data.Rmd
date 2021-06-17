@@ -55,7 +55,10 @@ longdata_2 <-
   mutate(days = (date - min(date)) %>% as.period() %>% day())
 ```
 
-recode variables.  For historical treatment, 0 = high moisture, 25 = medium moisture, 50 = low moisture.  For current conditions 0 = ambient, 25 (really, -25%) = 75%, and 50 = 50%
+recode variables.
+For historical treatment, 0 = high moisture, 25 = medium moisture, 50 = low moisture.
+For current conditions 0 = ambient, 25 (really, -25%) = 75%, and 50 = 50%
+
 ```{r}
 longdata_done <-
   longdata_2 %>% 
@@ -97,11 +100,9 @@ longdata_done <-
 # longdata_done %>% count(plant_id)
 ```
 
-
 ```{r}
 write_rds(longdata_done, here("data", "clean_data", "longdata.rds"))
 ```
-
 
 # Mid-season Harvest
 
@@ -130,7 +131,8 @@ july_harvest <-
     select(id, species, hist, curr, plot, pot, everything())
 july_harvest
 ```
-SPAD is "a no go"  wildly different values depending on whether it was raining or not.
+
+SPAD is "a no go" wildly different values depending on whether it was raining or not.
 
 ```{r}
 #plants that didn't get harvested I guess??
@@ -159,9 +161,9 @@ oats_harvest <-
   mutate(across(n:zn, ~str_remove(.x, "<"))) %>% 
   mutate(across(n:grainharvest, ~as.numeric(.x)))
 ```
-Harvest was not super reliable because of dehiscence and lost beans and oats. Focus only on chemistry here.
 
-
+Harvest was not super reliable because of dehiscence and lost beans and oats.
+Focus only on chemistry here.
 
 Repeat for beans and kale
 

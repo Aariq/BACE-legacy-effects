@@ -1,0 +1,124 @@
+---
+title: "Longitudinal Data Analysis Results"
+author: "Report Author"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+## target knits Rmds in their own session, so load libraries here.
+## source("../packages.R")
+library(car)
+```
+```{r}
+withr::with_dir(here::here(), {
+  tar_load(c(
+    k_ht,
+    b_ht,
+    o_ht,
+    longdata
+  ))
+})
+```
+
+# Analysis
+
+## Kale
+
+```{r}
+Anova(k_ht)
+```
+
+days = significant growth (slope of height over time)
+days:hist_treat:curr_treat = hard to interpret, especially since no main effects
+
+```{r}
+ggplot(my_augment(k_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
+  geom_line(aes(y = .fitted)) +
+  labs(y = "log(fitted height)")
+```
+
+## Beans
+
+```{r}
+Anova(b_ht)
+```
+
+- days = significant growth (change in height over time)
+- july_herbivory_count = significant effect of herbivory on height
+- days:hist_treat = different slopes (height over time) for different historical treatments
+
+plot
+
+```{r}
+ggplot(my_augment(b_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
+  geom_line(aes(y = .fitted)) +
+  labs(y = "log(fitted height)")
+```
+
+Only significant interaction:
+
+```{r}
+my_augment(b_ht) %>% 
+  group_by(hist_treat, days) %>% 
+  summarize(.fitted = mean(.fitted)) %>% 
+ggplot(aes(x = days, color = hist_treat)) + 
+  geom_line(aes(y = .fitted)) +
+  labs(y = "log(fitted height)")
+```
+
+## Oats
+
+```{r}
+Anova(o_ht)
+```
+
+- days = significant growth (change in height over time)
+- july_herbivory_count = significant effect of herbivory on height
+- days:curr_treat = different slopes (height over time) for different current treatments
+
+```{r}
+ggplot(my_augment(o_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
+  geom_line(aes(y = .fitted)) +
+  labs(y = "predicted height (cm)")
+```
+
+Three-way interaction probably driven by low x ambient vs low x 50%
+
+
+Only current condition interaction:
+
+```{r}
+my_augment(o_ht) %>% 
+  group_by(curr_treat, days) %>% 
+  summarize(.fitted = mean(.fitted)) %>% 
+ggplot(aes(x = days, linetype = curr_treat)) + 
+  geom_line(aes(y = .fitted)) +
+  labs(y = "predicted height (cm)")
+```
+
+
+# Reproducibility
+
+<details><summary>Reproducibility receipt</summary>
+
+```{r}
+## datetime
+Sys.time()
+
+## repository
+if(requireNamespace('git2r', quietly = TRUE)) {
+  git2r::repository()
+} else {
+  c(
+    system2("git", args = c("log", "--name-status", "-1"), stdout = TRUE),
+    system2("git", args = c("remote", "-v"), stdout = TRUE)
+  )
+}
+
+## session info
+sessionInfo()
+```
+
+</details>

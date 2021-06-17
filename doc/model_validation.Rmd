@@ -1,0 +1,74 @@
+---
+title: "Model Validation"
+author: "Eric Scott"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+## target knits Rmds in their own session, so load libraries here.
+## source("../packages.R")
+library(performance)
+library(see)
+```
+```{r}
+withr::with_dir(here::here(), {
+  tar_load(c(
+    k_ht,
+    b_ht,
+    o_ht,
+    longdata
+  ))
+})
+```
+
+# Model validation
+
+I'm not too worried about the results of `check_normality()`.
+
+## Kale
+
+```{r}
+check_normality(k_ht)
+check_heteroscedasticity(k_ht)
+check_model(k_ht, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
+```
+## Beans
+
+```{r}
+check_normality(b_ht)
+check_heteroscedasticity(b_ht)
+check_model(b_ht, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
+```
+
+## Oats
+
+```{r}
+check_normality(o_ht)
+check_heteroscedasticity(o_ht)
+check_model(o_ht, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
+```
+# Reproducibility
+
+<details><summary>Reproducibility receipt</summary>
+
+```{r}
+## datetime
+Sys.time()
+
+## repository
+if(requireNamespace('git2r', quietly = TRUE)) {
+  git2r::repository()
+} else {
+  c(
+    system2("git", args = c("log", "--name-status", "-1"), stdout = TRUE),
+    system2("git", args = c("remote", "-v"), stdout = TRUE)
+  )
+}
+
+## session info
+sessionInfo()
+```
+
+</details>

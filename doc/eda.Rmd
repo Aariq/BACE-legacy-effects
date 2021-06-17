@@ -1,0 +1,133 @@
+---
+title: "Exploratory Data Analysis"
+author: "Eric Scott"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+## target knits Rmds in their own session, so load libraries here.
+## source("../packages.R")
+```
+```{r}
+withr::with_dir(here::here(), {
+  tar_load(longdata)
+})
+```
+
+# Height over time
+
+Figure 2
+
+```{r}
+withr::with_dir(here::here(), {tar_read(longfig)})
+```
+# Daily growth rate
+
+What does it look like if we plot height - height yesterday?
+
+```{r}
+ggplot(longdata, aes(y = growth, x = date, color = hist_treat, linetype = curr_treat)) +
+  stat_summary(geom = "line", fun = "mean") +
+  stat_summary(geom = "point", fun = "mean", aes(shape = hist_treat)) +
+  facet_wrap(~species) +
+  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d")
+```
+```{r}
+ggplot(longdata, aes(growth)) + geom_histogram() + facet_wrap(~species)
+```
+Data looks leptokurtic.  Might not be as useful as I thought it might.
+
+# Determine cutoffs for exponential growth
+
+Kale continues growing throughout the season, but beans and oats both stop growing after a few weeks.
+I think it is reasonable to just "eyeball" the point at which they stop growing, and look at growth rates before that point (the alternative would be a logistic or changepoint model---[logistic](https://bscheng.com/2014/05/07/modeling-logistic-growth-data-in-r/) might be worth looking into).
+
+
+```{r}
+#split data
+beans <- longdata %>% filter(species == "beans")
+kale <-  longdata %>% filter(species == "kale")
+oats <-  longdata %>% filter(species == "oats")
+```
+
+## Beans
+
+```{r}
+ggplot(beans, aes(x = date, y = height)) +
+  stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line", fun = "mean") +
+  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d") +
+  scale_y_continuous("Height (cm)") +
+  scale_color_discrete("Historical") +
+  scale_linetype_discrete("Current") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Looks like 7/31 would be a good cutoff.
+
+```{r}
+beans_2 <- beans %>% filter(date <= ymd("2018-07-31"))
+ggplot(beans_2, aes(x = date, y = height)) +
+  stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line", fun = "mean") +
+  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d") +
+  scale_y_continuous("Height (cm)") +
+  scale_color_discrete("Historical") +
+  scale_linetype_discrete("Current") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Oats
+
+```{r}
+ggplot(oats, aes(x = date, y = height)) +
+  stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line", fun = "mean") +
+  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d") +
+  scale_y_continuous("Height (cm)") +
+  scale_color_discrete("Historical") +
+  scale_linetype_discrete("Current") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Less clear for oats---it seems like the end of growth depends on the treatment with oats in current dry conditions not really leveling off in size until the very end and in current ambient conditions growth is leveling off by 8/07.
+
+```{r}
+oats_2 <- oats %>% filter(date <= ymd("2018-08-07"))
+ggplot(oats_2, aes(x = date, y = height)) +
+  stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line", fun = "mean") +
+  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d") +
+  scale_y_continuous("Height (cm)") +
+  scale_color_discrete("Historical") +
+  scale_linetype_discrete("Current") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+
+# Reproducibility
+
+<details><summary>Reproducibility receipt</summary>
+
+```{r}
+## datetime
+Sys.time()
+
+## repository
+if(requireNamespace('git2r', quietly = TRUE)) {
+  git2r::repository()
+} else {
+  c(
+    system2("git", args = c("log", "--name-status", "-1"), stdout = TRUE),
+    system2("git", args = c("remote", "-v"), stdout = TRUE)
+  )
+}
+
+## session info
+sessionInfo()
+```
+
+</details>

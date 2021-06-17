@@ -22,6 +22,7 @@ library(lme4)
 library(performance)
 library(broom)
 library(broom.mixed)
+library(car)
 
 conflict_prefer("lag", "dplyr")
 conflict_prefer("filter", "dplyr")
@@ -160,38 +161,91 @@ start with kale because it keeps growing the whole time
 
 ## Height & time
 
+log link results in better normality
+log transformation results in homogeneity of variance.
+
 ```{r}
 hist(kale$height) #nonnormal
-hist(log(kale$height)) #normal except for a few small values
+hist(sqrt(kale$height)) #normal except for a few small values
 
 m_ht <-
   lmer(
-    log(height) ~ days*hist_treat*curr_treat + july_herbivory_count +
-      (1|plot_id) + (1|pot_id),
-    data = kale
+    sqrt(height) ~ days*hist_treat*curr_treat + july_herbivory_count +
+      (1+days|plot_id) + (1+days|pot_id),
+    data = kale,
   )
-
+summary(m_ht)
 check_normality(m_ht)
 performance::check_heteroscedasticity(m_ht)
 performance::check_model(m_ht, check = c("linearity", "qq", "normality", "homogeneity"))
 ```
 
-Check for significance of random effects
-
-```{r}
-m2 <- update(m_ht, .~. - (1|pot_id))
-m3 <- update(m_ht, .~. -(1|plot_id))
-bbmle::AICtab(m_ht, m2, m3)
-```
-
-pot ID, but not plot ID significant.
-Might as well keep both though.
 
 ```{r}
 car::Anova(m_ht)
 ```
 
-Not very satisfying results, difficult to interpret
+What if I use a logit link?  Is that a logistic growth model?
+
+```{r}
+kale <- kale %>% mutate(logit_ht = logit(height))
+m_ht_logit <-
+  lmer(
+    logit_ht ~ days*hist_treat*curr_treat + july_herbivory_count +
+      (1+days|plot_id) + (1+days|pot_id),
+    data = kale
+  )
+performance::check_model(m_ht_logit, check = c("linearity", "qq", "normality", "homogeneity"))
+```
+
+logistic growth function
+(https://bscheng.com/2014/05/07/modeling-logistic-growth-data-in-r/)
+$$
+y = \frac{\phi_1}{(1+e^{-(\phi_2 + \phi_3x)})}
+$$
+y = mass, or could be a population, or any response variable exhibiting logistic growth
+phi1 = the first parameter and is the asymptote (e.g. stable adult mass)
+phi2 = the second parameter and there’s not much else to say about it
+phi3 = the third parameter and is also known as the growth parameter, describes how quickly y approaches the asymptote
+x = the input variable, in our case, days since birth
+
+initial parameters for nls
+
+```{r}
+library(car)
+coef(lm(logit(height/100)~days, data = kale))
+```
+
+
+```{r}
+m_logistic <- nls(height ~ phi1 / (1 + exp(-(phi2 + phi3 * days))),
+ start = list(phi1 = 100, phi2 = -2.18, phi3 = .023), data = kale, trace=TRUE)
+summary(m_logistic)
+
+```
+
+```{r}
+plot(m_logistic)
+```
+
+```{r}
+#set parameters
+phi1 <- coef(m_logistic)[1]
+phi2 <- coef(m_logistic)[2]
+phi3 <- coef(m_logistic)[3]
+x <-
+  c(min(kale$days):max(kale$days)) #construct a range of x values bounded by the data
+y <- phi1 / (1 + exp(-(phi2 + phi3 * x))) #predicted mass
+predict <-
+  data.frame(x, y) #create the prediction data frame#And add a nice plot (I cheated and added the awesome inset jpg in another program)
+ggplot(data = kale, aes(x = days, y = height)) +
+  geom_jitter(color = 'blue', alpha = 0.4) +
+  scale_x_continuous() +
+  scale_y_continuous() +
+  geom_line(data = predict, aes(x = x, y = y))
+
+```
+Cool, but don't know how to add covariates
 
 ## Growth
 ```{r}
@@ -244,4 +298,15 @@ anova(gam_gr)
 ```
 
 nothing significant.
+
+#Growth curve model
+Links:
+https://m-clark.github.io/mixed-models-with-R/supplemental.html
+https://quantdev.ssri.psu.edu/tutorials/growth-modeling-chapter-3-linear-growth-models
+https://lavaan.ugent.be/tutorial/growth.html
+
+```{r}
+
+```
+
 

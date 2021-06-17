@@ -27,6 +27,21 @@ library(car)
 conflict_prefer("lag", "dplyr")
 conflict_prefer("filter", "dplyr")
 ```
+```{r}
+#function for plotting fitted data from lmer() models
+my_augment <- function(model) {
+  mf <- model.frame(model)
+  newdata <-  expand_grid(hist_treat = factor(levels(mf$hist_treat), levels(mf$hist_treat)),
+                          curr_treat = factor(levels(mf$curr_treat), levels(mf$curr_treat)),
+                          days = seq(min(mf$days), max(mf$days), length.out = 50),
+                          july_herbivory_count = 0,
+                          plot_id = "newlevel",
+                          pot_id = "newlevel",
+                          plant_id = "newlevel")
+  plotdf <- augment(model, newdata = newdata, allow.new.levels = TRUE)
+  return(plotdf)
+}
+```
 
 *Last compiled: `r Sys.Date()`*
 
@@ -179,14 +194,13 @@ Fit full model
 k_ht <-
   lmer(
     log(height) ~ days * hist_treat * curr_treat + july_herbivory_count +
-      (1|plot_id) + (1|pot_id), #just random intercepts
-    data = kale,
+      (1|plot_id) + (1|pot_id) + (1|plant_id), #just random intercepts
+    data = kale %>% filter(!is.na(height)),
   )
 ```
 singularity warning likely due to random effects close to 0?
 
 ```{r}
-check_normality(k_ht)
 check_heteroscedasticity(k_ht)
 check_model(k_ht, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
 ```
@@ -198,7 +212,11 @@ Anova(k_ht)
 days = significant growth (slope of height over time)
 days:hist_treat:curr_treat = hard to interpret, especially since no main effects
 
-
+```{r}
+ggplot(my_augment(k_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
+  geom_line(aes(y = .fitted)) +
+  labs(y = "log(fitted height)")
+```
 
 ### Growth ~
 
@@ -325,6 +343,24 @@ Anova(b_ht)
 - july_herbivory_count = significant effect of herbivory on height
 - days:hist_treat = different slopes (height over time) for different historical treatments
 
+plot
+
+```{r}
+ggplot(my_augment(b_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
+  geom_line(aes(y = .fitted)) +
+  labs(y = "log(fitted height)")
+```
+
+Only significant interaction:
+```{r}
+my_augment(b_ht) %>% 
+  group_by(hist_treat, days) %>% 
+  summarize(.fitted = mean(.fitted)) %>% 
+ggplot(aes(x = days, color = hist_treat)) + 
+  geom_line(aes(y = .fitted)) +
+  labs(y = "log(fitted height)")
+```
+
 ## Oats
 
 Fit full model
@@ -356,6 +392,24 @@ Anova(o_ht)
 - july_herbivory_count = significant effect of herbivory on height
 - days:curr_treat = different slopes (height over time) for different current treatments
 
+```{r}
+ggplot(my_augment(o_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
+  geom_line(aes(y = .fitted)) +
+  labs(y = "predicted height (cm)")
+```
+Three-way interaction probably driven by low x ambient vs low x 50%
+
+
+Only current condition interaction:
+
+```{r}
+my_augment(o_ht) %>% 
+  group_by(curr_treat, days) %>% 
+  summarize(.fitted = mean(.fitted)) %>% 
+ggplot(aes(x = days, linetype = curr_treat)) + 
+  geom_line(aes(y = .fitted)) +
+  labs(y = "predicted height (cm)")
+```
 
 
 

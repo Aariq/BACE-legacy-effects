@@ -192,8 +192,13 @@ check_model(k_ht, check = c("linearity", "qq", "normality", "homogeneity", "reqq
 ```
 
 ```{r}
-summary(k_ht)
+Anova(k_ht)
 ```
+
+days = significant growth (slope of height over time)
+days:hist_treat:curr_treat = hard to interpret, especially since no main effects
+
+
 
 ### Growth ~
 
@@ -300,7 +305,7 @@ Fit full model
 b_ht <-
   lmer(
     log(height) ~ days * hist_treat * curr_treat + july_herbivory_count +
-      (1|plot_id) + (1|pot_id), #random intercepts only
+      (1|plot_id) + (1|pot_id) + (1|plant_id), #random intercepts only
     data = beans_2,
   )
 
@@ -312,16 +317,26 @@ check_heteroscedasticity(b_ht)
 check_model(b_ht,check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
 ```
 
+```{r}
+Anova(b_ht)
+```
+
+- days = significant growth (change in height over time)
+- july_herbivory_count = significant effect of herbivory on height
+- days:hist_treat = different slopes (height over time) for different historical treatments
+
 ## Oats
 
 Fit full model
 
+This one is better without log transformation
+
 ```{r}
 o_ht <-
   lmer(
-    log(height) ~ days * hist_treat * curr_treat + july_herbivory_count +
-      (1|plot_id) + (1|pot_id), #random intercepts only
-    data = beans_2,
+    height ~ days * hist_treat * curr_treat + july_herbivory_count +
+      (1|plot_id) + (1|pot_id) + (1|plant_id), #random intercepts only
+    data = oats_2,
   )
 
 summary(o_ht)
@@ -329,5 +344,70 @@ summary(o_ht)
 
 ```{r}
 check_heteroscedasticity(o_ht)
-check_model(o_ht,check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
+check_model(o_ht, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
+```
+
+
+```{r}
+Anova(o_ht)
+```
+
+- days = significant growth (change in height over time)
+- july_herbivory_count = significant effect of herbivory on height
+- days:curr_treat = different slopes (height over time) for different current treatments
+
+
+
+
+# Change from baseline
+
+So the other way to do this would be a change from baseline analysis---calculate change in ht for each individual plant so there is just one number, not a timeseries.  Has less statistical power because n=~200 instead of n=~3,000
+
+```{r}
+tg <- longdata_2 %>% 
+  filter(!is.na(height)) %>%
+  group_by(plant_id) %>% 
+  arrange(plant_id, date) %>% 
+  summarize(species = unique(species),
+            total_growth = last(height) - first(height),
+            plot_id = unique(plot_id),
+            pot_id = unique(pot_id),
+            curr_treat = unique(curr_treat),
+            hist_treat = unique(hist_treat),
+            july_herbivory_count = unique(july_herbivory_count)
+            )
+hist(tg$total_growth)
+```
+
+```{r}
+k_tg <- lmer(total_growth ~ curr_treat*hist_treat + july_herbivory_count + (1|plot_id) + (1|pot_id),
+             data = tg %>% filter(species == "kale"))
+check_model(k_tg, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
+```
+
+Not great
+
+```{r}
+Anova(k_tg)
+```
+
+```{r}
+b_tg <- lmer(total_growth ~ curr_treat*hist_treat + july_herbivory_count + (1|plot_id) + (1|pot_id),
+             data = tg %>% filter(species == "beans"))
+check_model(b_tg, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
+```
+
+```{r}
+Anova(b_tg)
+```
+
+
+```{r}
+o_tg <- lmer(total_growth ~ curr_treat*hist_treat + july_herbivory_count + (1|plot_id) + (1|pot_id),
+             data = tg %>% filter(species == "oats"))
+check_model(o_tg, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
+```
+
+```{r}
+Anova(o_tg)
 ```

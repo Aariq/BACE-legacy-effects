@@ -1,0 +1,208 @@
+---
+title: "Multivariate analysis of nutrients"
+author: "Eric Scott"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, paged.print=FALSE)
+## target knits Rmds in their own session, so load libraries here.
+## source("here::here(packages.R"))
+library(targets)
+library(vegan)
+library(RVAideMemoire)
+```
+
+```{r load-targets, include=FALSE}
+withr::with_dir(here::here(), {
+  tar_load(c(
+    oat_nutr,
+    bean_nutr,
+    kale_nutr
+  ))
+})
+```
+
+# Analysis
+
+Do historical and current treatments (and their interaction) differ in nutrient **concentration**?
+
+Approach: redundancy analysis
+
+## Oats
+
+```{r}
+nutr <- as.matrix(select(oat_nutr, c(n, ca, k, mg, p, al, b, cu, fe, mn, zn)))
+oat_rda <- rda(nutr ~ historical*current + august_herbivory, data = oat_nutr, scale = TRUE)
+```
+
+```{r}
+MVA.synt(oat_rda)
+```
+
+"Experiment" explains ~26% of variation in nutrients
+Axis 1 explains about 71% of variation among treatments (like $R^2_Y$)
+
+### Permutation Test
+
+```{r}
+MVA.anova(oat_rda)
+```
+
+Current conditions affect nutrients, but not historical conditions.
+
+### Plots
+
+```{r}
+MVA.plot(
+  oat_rda,
+  "score",
+  fac = oat_nutr$current,
+  col = c("blue", "darkgreen", "brown"),
+  legend = TRUE,
+  barycenters = FALSE,
+  stars = FALSE,
+  contours = TRUE,
+  legend.title = "current",
+  xlim = c(-5, 5)
+)
+MVA.plot(
+  oat_rda,
+  "corr",
+  add = FALSE,
+  # intcircle = NULL,
+  # thresh = 0.5
+)
+```
+
+## Beans
+
+```{r}
+nutr <- as.matrix(select(bean_nutr, c(n, ca, k, mg, p, al, b, cu, fe, mn, zn)))
+bean_rda <- rda(nutr ~ historical*current + august_herbivory, data = bean_nutr, scale = TRUE)
+```
+
+```{r}
+MVA.synt(bean_rda)
+```
+
+~27% of variation explained by "experiment"
+
+### Permutation Test
+
+```{r}
+MVA.anova(bean_rda)
+```
+
+current conditions and herbivory significantly affect nutrients.
+
+### Plots
+
+```{r}
+MVA.plot(
+  bean_rda,
+  "score",
+  fac = bean_nutr$current,
+  col = c("blue", "darkgreen", "brown"),
+  legend = TRUE,
+  barycenters = FALSE,
+  stars = FALSE,
+  contours = TRUE,
+  legend.title = "current",
+  xlim = c(-5, 5)
+)
+MVA.plot(
+  bean_rda,
+  "corr",
+  add = FALSE,
+  # intcircle = NULL,
+  # thresh = 0.5
+)
+```
+
+## Kale
+
+```{r}
+nutr <- as.matrix(select(kale_nutr, c(n, ca, k, mg, p, al, b, cu, fe, mn, zn)))
+kale_rda <- rda(nutr ~ historical*current + august_herbivory, data = kale_nutr, scale = TRUE)
+```
+
+```{r}
+MVA.synt(kale_rda)
+```
+
+~25% of variance explained by "experiment"
+
+### Permutation Test
+
+```{r}
+MVA.anova(kale_rda)
+```
+
+historical and current conditions affect nutrition.  Not their interaction or herbivory.
+
+### Plots
+
+```{r}
+MVA.plot(
+  kale_rda,
+  "score",
+  fac = kale_nutr$historical,
+  col = c("blue", "darkgreen", "brown"),
+  legend = TRUE,
+  barycenters = FALSE,
+  stars = FALSE,
+  contours = TRUE,
+  legend.title = "historical",
+  xlim = c(-5, 5)
+)
+MVA.plot(
+  kale_rda,
+  "score",
+  fac = kale_nutr$current,
+  col = c("blue", "darkgreen", "brown"),
+  legend = TRUE,
+  barycenters = FALSE,
+  stars = FALSE,
+  contours = TRUE,
+  legend.title = "current",
+  xlim = c(-5, 5)
+)
+MVA.plot(
+  kale_rda,
+  "corr",
+  add = FALSE,
+  # intcircle = NULL,
+  # thresh = 0.5
+)
+```
+
+Axis 1 = more nutrition to less nutrition, separates along historical from high, low, medium
+Axis 2 = high in zn and n to high in p, cu, mn. separates current from 75%, 50%, ambient.
+
+# Reproducibility
+
+<details><summary>Reproducibility receipt</summary>
+
+```{r}
+## datetime
+Sys.time()
+
+## repository
+if(requireNamespace('git2r', quietly = TRUE)) {
+  git2r::repository()
+} else {
+  c(
+    system2("git", args = c("log", "--name-status", "-1"), stdout = TRUE),
+    system2("git", args = c("remote", "-v"), stdout = TRUE)
+  )
+}
+
+## session info
+sessionInfo()
+```
+
+</details>

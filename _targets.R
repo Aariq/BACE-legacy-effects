@@ -32,7 +32,17 @@ tar_plan(
   #model validation
   tar_render(model_validation, "doc/model_validation.Rmd"),
   
-  #Results
-  tar_render(long_results, "doc/long_results.Rmd")
+  #Longitudinal Results
+  tar_render(long_results, "doc/long_results.Rmd"),
   
+  #Nutrient data
+  tar_target(nutr_file, here("data", "three_period_data_5_13_2021.xlsx"), format = "file"),
+  oat_nutr_raw = read_excel(nutr_file, sheet = "Oats(pot)"),
+  bean_nutr_raw = read_excel(nutr_file, sheet = "Beans (pot)"),
+  kale_nutr_raw = read_excel(nutr_file, sheet = "Kale (Latepot)"),
+  bean_nutr = clean_bean_nutr(bean_nutr_raw),
+  oat_nutr = clean_oat_nutr(oat_nutr_raw),
+  kale_nutr = clean_kale_nutr(kale_nutr_raw),
+  
+  tar_render(nutrient_rda, "doc/nutrient_rda.Rmd")
 )

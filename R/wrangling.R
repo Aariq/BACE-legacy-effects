@@ -53,3 +53,73 @@ calc_growth <- function(longdata) {
     mutate(growth = height - lag(height))
   return(out)
 }
+
+
+clean_oat_nutr <- function(oat_nutr_raw) {
+  oat_nutr_raw %>% 
+    clean_names() %>% 
+    slice(-1) %>%  #remove row with units
+    mutate(across(n:zn, ~str_remove(.x, "<"))) %>% #just include numbers < LOQ
+    mutate(across(n:grainharvest, ~as.numeric(.x))) %>% 
+    mutate(
+      current = fct_recode(
+        as.character(current),
+        "ambient" = "0",
+        "75%" = "25",
+        "50%" = "50"
+      ),
+      historical = fct_recode(
+        as.character(historical),
+        "high" = "0",
+        "medium" = "25",
+        "medium" = "35", #fix typo
+        "low" = "50"
+      )
+    )
+}
+
+clean_bean_nutr <- function(bean_nutr_raw) {
+  bean_nutr_raw %>% 
+    clean_names() %>% 
+    slice(-1) %>%  #remove row with units
+    mutate(across(n:zn, ~str_remove(.x, "<"))) %>%  #just include numbers < LOQ
+    mutate(across(n:beanmass, ~as.numeric(.x))) %>% 
+    rename(current = current_moisture, historical = historical_treatment) %>% 
+    mutate(
+      current = fct_recode(
+        as.character(current),
+        "ambient" = "0",
+        "75%" = "25",
+        "50%" = "50"
+      ),
+      historical = fct_recode(
+        as.character(historical),
+        "high" = "0",
+        "medium" = "25",
+        "low" = "50"
+      )
+    )
+}
+
+clean_kale_nutr <- function(kale_nutr_raw) {
+  kale_nutr_raw %>% 
+    clean_names() %>% 
+    slice(-1) %>%  #remove row with units
+    mutate(across(n:zn, ~str_remove(.x, "<"))) %>%  #just include numbers < LOQ
+    mutate(across(n:august_herbivory, ~as.numeric(.x))) %>% 
+    rename(current = current_moisture, historical = historical_treatment) %>% 
+    mutate(
+      current = fct_recode(
+        as.character(current),
+        "ambient" = "0",
+        "75%" = "25",
+        "50%" = "50"
+      ),
+      historical = fct_recode(
+        as.character(historical),
+        "high" = "0",
+        "medium" = "25",
+        "low" = "50"
+      )
+    )
+}

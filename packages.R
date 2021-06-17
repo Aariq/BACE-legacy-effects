@@ -14,6 +14,8 @@ library(lme4)
 library(rmarkdown)
 library(broom)
 library(broom.mixed)
+library(vegan)
+library(RVAideMemoire)
 
 conflict_prefer("lag", "dplyr")
 conflict_prefer("filter", "dplyr")

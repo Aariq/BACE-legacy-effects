@@ -97,14 +97,6 @@ longdata_done <-
 # longdata_done %>% count(plant_id)
 ```
 
-Order factors
-
-```{r}
-longdata_done <- 
-  longdata_done %>% 
-  mutate(hist_treat = fct_relevel(hist_treat, "high", "medium", "low"), 
-         curr_treat = fct_relevel(curr_treat, "ambient", "75%", "50%"))
-```
 
 ```{r}
 write_rds(longdata_done, here("data", "clean_data", "longdata.rds"))

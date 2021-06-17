@@ -4,6 +4,10 @@ source("./packages.R")
 ## Load your R files
 lapply(list.files("./R", full.names = TRUE), source)
 
+## Options
+options(tidyverse.quiet = TRUE)
+tar_option_set()
+
 ## tar_plan supports drake-style targets and also tar_target()
 tar_plan(
   # longitudinal data

@@ -91,7 +91,7 @@ longdata_done <-
       "{pot_id}_{plant}"
     )
   ) %>%
-  mutate(across(ends_with("_id"), as.factor)) %>% 
+  mutate(across(ends_with("_id"), as.character)) %>%
   rename(species = plant_species)
 
 # longdata_done %>% count(plant_id)

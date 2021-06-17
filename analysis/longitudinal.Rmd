@@ -52,14 +52,49 @@ Figure 2: As facets:
 ggplot(longdata, aes(x = date, y = height)) +
   stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line", fun = "mean") +
   facet_wrap(~species, scales = "free_y", ncol = 1) +
-  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d") +
+  scale_x_datetime("Date", date_breaks = "1 week", date_labels = "%m/%d") +
   scale_y_continuous("Height (cm)") +
   scale_color_discrete("Historical") +
   scale_linetype_discrete("Current") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
 ```
+
+# Growth rate
+
+Wait, before cutting off dates, let's calculate growth rate and see how that looks.
+
+```{r}
+longdata_2 <-
+  longdata %>%
+  group_by(species, plant_id) %>%
+  arrange(date) %>% 
+  mutate(growth = height - lag(height))
+
+
+ggplot(longdata_2, aes(y = growth, x = date, color = hist_treat, linetype = curr_treat)) +
+  stat_summary(geom = "line", fun = "mean") +
+  stat_summary(geom = "point", fun = "mean", aes(shape = hist_treat)) +
+  facet_wrap(~species) +
+  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d")
+```
+
+
+```{r}
+ggplot(longdata_2, aes(growth)) + geom_histogram() + facet_wrap(~species)
+```
+
+Growth data is leptokurtic, so might not be better.
+
+I think it might be best to go from after initial herbivory (ask when `july_herbivory_count` happened) to just before growth levels off for **all treatments**.
+Then say, oats and beans showed logistic growth patterns, but we were only interested in the linear growth phase and in final heights.
+
+One set of models for growth \~ curr_treat\*hist_treat + july_herbivory_count
+
+then with final harvest data do mass \~ .
+or final_height \~ .
+
+
 
 # Determine cutoffs
 
@@ -69,9 +104,9 @@ Then, I'll calculate a daily growth to hopefully reduce heteroskedasticity and r
 
 ```{r}
 #split data
-beans <- longdata %>% filter(species == "beans")
-kale <- longdata %>% filter(species == "kale")
-oats <- longdata %>% filter(species == "oats")
+beans <- longdata_2 %>% filter(species == "beans")
+kale <-  longdata_2 %>% filter(species == "kale")
+oats <-  longdata_2 %>% filter(species == "oats")
 ```
 
 ## Beans
@@ -91,6 +126,14 @@ Looks like 7/31 would be a good cutoff.
 
 ```{r}
 beans_2 <- beans %>% filter(date <= ymd("2018-07-31"))
+ggplot(beans_2, aes(x = date, y = height)) +
+  stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line", fun = "mean") +
+  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d") +
+  scale_y_continuous("Height (cm)") +
+  scale_color_discrete("Historical") +
+  scale_linetype_discrete("Current") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ## Oats
@@ -108,98 +151,100 @@ ggplot(oats, aes(x = date, y = height)) +
 
 Less clear for oats---it seems like the end of growth depends on the treatment with oats in current dry conditions not really leveling off in size until the very end and in current ambient conditions growth is leveling off by 8/07.
 
-# Growth rate
-
-Wait, before cutting off dates, let's calculate growth rate and see how that looks.
-
 ```{r}
-longdata_2 <-
-  longdata %>%
-  group_by(species, plant_id) %>%
-  arrange(date) %>% 
-  mutate(growth = height - lag(height))
-
-
-ggplot(longdata_2, aes(y = growth, x = date, color = hist_treat, linetype = curr_treat)) +
-  stat_summary(geom = "line", fun = "mean") +
-  stat_summary(geom = "point", fun = "mean", aes(shape = hist_treat)) +
-  facet_wrap(~species) +
-  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d")
-
-
-ggplot(longdata_2, aes(growth)) + geom_histogram() + facet_wrap(~species)
-
+oats_2 <- oats %>% filter(date <= ymd("2018-08-07"))
+ggplot(oats_2, aes(x = date, y = height)) +
+  stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line", fun = "mean") +
+  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d") +
+  scale_y_continuous("Height (cm)") +
+  scale_color_discrete("Historical") +
+  scale_linetype_discrete("Current") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-raw data is pretty normally distributed, but growth clearly depends on date for beans and oats.
-So seems like some cutoffs would be useful if the goal is really to get rid of "date" as a co-variate.
-Could just include date and deal with 3-way interaction?
-Could look into timeseries methods?
 
-I think it might be best to go from after initial herbivory (ask when `july_herbivory_count` happened) to just before growth levels off for **all treatments**.
-Then say, oats and beans showed logistic growth patterns, but we were only interested in the linear growth phase and in final heights.
-
-One set of models for growth \~ curr_treat\*hist_treat + july_herbivory_count
-
-then with final harvest data do mass \~ .
-or final_heigth \~ .
 
 # Models
 
-```{r}
-long_list <-
-  longdata_2 %>%
-  group_by(species) %>%
-  group_split()
-
-beans <- long_list[[1]]
-kale <- long_list[[2]]
-oats <- long_list[[3]]
-```
-
 start with kale because it keeps growing the whole time
 
-## Height & time
+## Kale
 
-log link results in better normality
-log transformation results in homogeneity of variance.
+### Height ~ days
+
+Fit full model
 
 ```{r}
-hist(kale$height) #nonnormal
-hist(sqrt(kale$height)) #normal except for a few small values
-
-m_ht <-
+k_ht <-
   lmer(
-    sqrt(height) ~ days*hist_treat*curr_treat + july_herbivory_count +
-      (1+days|plot_id) + (1+days|pot_id),
+    log(height) ~ days * hist_treat * curr_treat + july_herbivory_count +
+      (1|plot_id) + (1|pot_id), #just random intercepts
     data = kale,
   )
-summary(m_ht)
-check_normality(m_ht)
-performance::check_heteroscedasticity(m_ht)
-performance::check_model(m_ht, check = c("linearity", "qq", "normality", "homogeneity"))
 ```
-
+singularity warning likely due to random effects close to 0?
 
 ```{r}
-car::Anova(m_ht)
+check_normality(k_ht)
+check_heteroscedasticity(k_ht)
+check_model(k_ht, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
 ```
 
-What if I use a logit link?  Is that a logistic growth model?
+```{r}
+summary(k_ht)
+```
+
+### Growth ~
 
 ```{r}
-kale <- kale %>% mutate(logit_ht = logit(height))
-m_ht_logit <-
+hist(kale$growth) #leptokurtic
+```
+
+```{r}
+k_gr <- 
   lmer(
-    logit_ht ~ days*hist_treat*curr_treat + july_herbivory_count +
-      (1+days|plot_id) + (1+days|pot_id),
+    growth ~ hist_treat*curr_treat + july_herbivory_count +
+      (1|plot_id) + (1|pot_id), 
     data = kale
   )
-performance::check_model(m_ht_logit, check = c("linearity", "qq", "normality", "homogeneity"))
+summary(k_gr) #plot ID non significant, variance = 0
 ```
 
-logistic growth function
+
+```{r}
+check_heteroscedasticity(k_gr)
+check_model(k_gr, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
+```
+
+Not worried about homogeneity of variance, but kurtosis is real bad.
+
+
+#### Growth with family = scat
+
+The Scaled t family is appropriate for leptokurtic distributions, but only available in `mgcv::gam()` as far as I know. Fortunately, `gam()` can fit random effects.
+
+```{r}
+library(mgcv)
+library(gratia)
+k_gr_gam <-
+  mgcv::gam(growth ~ hist_treat*curr_treat + july_herbivory_count +
+              s(plot_id, bs = "re") + s(pot_id, bs = "re"),
+      data = kale %>% filter(!is.na(growth)) %>% mutate(across(ends_with("_id"), as.factor)),
+      family = scat)
+
+AIC(k_gr_gam, k_gr)
+
+gratia::appraise(k_gr_gam)
+```
+
+seems better, but likely overkill.
+
+
+### Logistic growth
+
 (https://bscheng.com/2014/05/07/modeling-logistic-growth-data-in-r/)
+
 $$
 y = \frac{\phi_1}{(1+e^{-(\phi_2 + \phi_3x)})}
 $$
@@ -247,66 +292,42 @@ ggplot(data = kale, aes(x = days, y = height)) +
 ```
 Cool, but don't know how to add covariates
 
-## Growth
-```{r}
-hist(kale$growth) #leptokurtic
-```
+
+## Beans
+Fit full model
 
 ```{r}
-m_gr <- 
+b_ht <-
   lmer(
-    growth ~ hist_treat*curr_treat + july_herbivory_count +
-      (1|plot_id) + (1|pot_id), 
-    data = kale
+    log(height) ~ days * hist_treat * curr_treat + july_herbivory_count +
+      (1|plot_id) + (1|pot_id), #random intercepts only
+    data = beans_2,
   )
-summary(m_gr) #plot ID non significant again, variance = 0
-```
 
+summary(b_ht)
+```
 
 ```{r}
-check_normality(m_gr)
-performance::check_heteroscedasticity(m_gr)
-performance::check_model(m_gr, check = c("linearity", "qq", "normality", "homogeneity"))
+check_heteroscedasticity(b_ht)
+check_model(b_ht,check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
 ```
 
-Not worried about homogeneity of variance, but kurtosis is real bad.
+## Oats
+
+Fit full model
 
 ```{r}
-car::Anova(m_gr)
-```
+o_ht <-
+  lmer(
+    log(height) ~ days * hist_treat * curr_treat + july_herbivory_count +
+      (1|plot_id) + (1|pot_id), #random intercepts only
+    data = beans_2,
+  )
 
-## Growth with family = scat
-The Scaled t family is appropriate for leptokurtic distributions, but only available in `mgcv::gam()` as far as I know. Fortunately, `gam()` can fit random effects.
+summary(o_ht)
+```
 
 ```{r}
-library(mgcv)
-library(gratia)
-gam_gr <-
-  mgcv::gam(growth ~ hist_treat*curr_treat + july_herbivory_count +
-              s(plot_id, bs = "re") + s(pot_id, bs = "re"),
-      data = kale %>% filter(!is.na(growth)),
-      family = scat)
-
-AIC(gam_gr, m_gr)
-
-gratia::appraise(gam_gr)
+check_heteroscedasticity(o_ht)
+check_model(o_ht,check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
 ```
-seems better
-
-```{r}
-anova(gam_gr)
-```
-
-nothing significant.
-
-#Growth curve model
-Links:
-https://m-clark.github.io/mixed-models-with-R/supplemental.html
-https://quantdev.ssri.psu.edu/tutorials/growth-modeling-chapter-3-linear-growth-models
-https://lavaan.ugent.be/tutorial/growth.html
-
-```{r}
-
-```
-
-

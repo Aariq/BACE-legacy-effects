@@ -2,13 +2,16 @@
 title: "Model Validation"
 author: "Eric Scott"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 ## target knits Rmds in their own session, so load libraries here.
 ## source("../packages.R")
+library(targets)
 library(performance)
 library(see)
 ```
@@ -25,16 +28,27 @@ withr::with_dir(here::here(), {
 
 # Model validation
 
-I'm not too worried about the results of `check_normality()`.
+All the models have the same formula:
+
+```{r}
+formula(k_ht)
+```
+
+NOTE: I'm not too worried about the results of `check_normality()`.
 
 ## Kale
+
+With `log(height)` as the response variable.
 
 ```{r}
 check_normality(k_ht)
 check_heteroscedasticity(k_ht)
 check_model(k_ht, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
 ```
+
 ## Beans
+
+With `log(height)` as the response variable.
 
 ```{r}
 check_normality(b_ht)
@@ -44,11 +58,15 @@ check_model(b_ht, check = c("linearity", "qq", "normality", "homogeneity", "reqq
 
 ## Oats
 
+This was actually better with the height response untransformed.
+
 ```{r}
 check_normality(o_ht)
 check_heteroscedasticity(o_ht)
 check_model(o_ht, check = c("linearity", "qq", "normality", "homogeneity", "reqq"))
 ```
+
+
 # Reproducibility
 
 <details><summary>Reproducibility receipt</summary>

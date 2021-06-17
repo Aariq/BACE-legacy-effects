@@ -2,13 +2,17 @@
 title: "Exploratory Data Analysis"
 author: "Eric Scott"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ## target knits Rmds in their own session, so load libraries here.
 ## source("../packages.R")
+library(targets)
+library(tarchetypes)
 ```
 ```{r}
 withr::with_dir(here::here(), {

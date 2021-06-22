@@ -13,7 +13,9 @@ knitr::opts_chunk$set(echo = FALSE)
 ## source("../packages.R")
 library(targets)
 library(tarchetypes)
+library(tidyverse)
 ```
+
 ```{r}
 withr::with_dir(here::here(), {
   tar_load(longdata)
@@ -27,6 +29,7 @@ Figure 2
 ```{r}
 withr::with_dir(here::here(), {tar_read(longfig)})
 ```
+
 # Daily growth rate
 
 What does it look like if we plot height - height yesterday?
@@ -41,6 +44,7 @@ ggplot(longdata, aes(y = growth, x = date, color = hist_treat, linetype = curr_t
 ```{r}
 ggplot(longdata, aes(growth)) + geom_histogram() + facet_wrap(~species)
 ```
+
 Data looks leptokurtic.  Might not be as useful as I thought it might.
 
 # Determine cutoffs for exponential growth

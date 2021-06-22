@@ -5,6 +5,9 @@ wrangle_longdata <- function(longdata_raw) {
     janitor::clean_names() %>% 
     #get column types right
     mutate(july_herbivory_count = as.integer(july_herbivory_count),
+           july_herbivory = case_when(july_herbivory_count == 0L ~ 0L,
+                                      july_herbivory_count > 0L ~ 1L,
+                                      TRUE ~ NA_integer_),
            height = as.double(height),
            across(c(plant_species, plot, curr_treat, hist_treat, pot, plant), as.factor)) %>% 
     rename(date = week, species = plant_species) %>% 

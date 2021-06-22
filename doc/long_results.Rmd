@@ -8,12 +8,16 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 ## target knits Rmds in their own session, so load libraries here.
 ## source("../packages.R")
 library(targets)
+library(lme4)
 library(car)
+library(tidyverse)
+library(emmeans)
 ```
+
 ```{r}
 withr::with_dir(here::here(), {
   tar_load(c(
@@ -29,17 +33,47 @@ withr::with_dir(here::here(), {
 
 ## Kale
 
+Model:
+
+
 ```{r}
 Anova(k_ht)
 ```
 
-days = significant growth (slope of height over time)
-days:hist_treat:curr_treat = hard to interpret, especially since no main effects
+- days = significant growth (slope of height over time) 
+- days:hist_treat:curr_treat = hard to interpret, especially since no main effects
 
 ```{r}
 ggplot(my_augment(k_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
   geom_line(aes(y = .fitted)) +
   labs(y = "log(fitted height)")
+```
+
+Since the difference in the slopes is the focus, I can plot just the slopes for each line, with confidence intervals.  95% CIs are typical, but here I'm plotting 84% CIs which overlap about 95% of the time for random samples from the same population (i.e. null hypothesis) (Payton et al. 2003).
+
+```{r}
+k_slopes <- emtrends(k_ht, ~ hist_treat*curr_treat, var = "days", level = 0.84)
+k_slope_df <- 
+  k_slopes %>% 
+  as_tibble() %>% 
+  # back-transform linear slope to exponential growth rate?
+  mutate(across(c(days.trend, lower.CL, upper.CL), ~exp(.x)))
+
+ggplot(k_slope_df) +
+  geom_pointrange(aes(
+    x = curr_treat,
+    color = hist_treat,
+    y = days.trend,
+    ymin = lower.CL,
+    ymax = upper.CL
+  ),
+  position = position_dodge(width = 0.2)) +
+  labs(
+    title = "Kale",
+    x = "Current treatment",
+    color = "Historical treatment",
+    y = "Exponential growth rate"
+  )
 ```
 
 ## Beans
@@ -48,9 +82,8 @@ ggplot(my_augment(k_ht), aes(x = days, color = hist_treat, linetype = curr_treat
 Anova(b_ht)
 ```
 
-- days = significant growth (change in height over time)
-- july_herbivory_count = significant effect of herbivory on height
-- days:hist_treat = different slopes (height over time) for different historical treatments
+-   days = significant growth (change in height over time)
+-   days:hist_treat = different slopes (height over time) for different historical treatments
 
 plot
 
@@ -71,15 +104,43 @@ ggplot(aes(x = days, color = hist_treat)) +
   labs(y = "log(fitted height)")
 ```
 
+Only slopes:
+
+```{r}
+b_slopes <- emtrends(b_ht, ~ hist_treat*curr_treat, var = "days", level = 0.84)
+b_slope_df <- 
+  b_slopes %>% 
+  as_tibble() %>% 
+  # back-transform linear slope to exponential growth rate?
+  mutate(across(c(days.trend, lower.CL, upper.CL), ~exp(.x)))
+
+ggplot(b_slope_df) +
+  geom_pointrange(aes(
+    x = curr_treat,
+    color = hist_treat,
+    y = days.trend,
+    ymin = lower.CL,
+    ymax = upper.CL
+  ),
+  position = position_dodge(width = 0.2)) +
+  labs(
+    title = "Beans",
+    x = "Current treatment",
+    color = "Historical treatment",
+    y = "Exponential growth rate"
+  )
+```
+
 ## Oats
 
 ```{r}
 Anova(o_ht)
 ```
 
-- days = significant growth (change in height over time)
-- july_herbivory_count = significant effect of herbivory on height
-- days:curr_treat = different slopes (height over time) for different current treatments
+-   days = significant growth (change in height over time)
+-   july_herbivory = significant effect of herbivory on height
+-   days:curr_treat = different slopes (height over time) for different current treatments
+-   days:hist_treat:curr_treat = hard to interpret, especially since no main effects
 
 ```{r}
 ggplot(my_augment(o_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
@@ -88,7 +149,6 @@ ggplot(my_augment(o_ht), aes(x = days, color = hist_treat, linetype = curr_treat
 ```
 
 Three-way interaction probably driven by low x ambient vs low x 50%
-
 
 Only current condition interaction:
 
@@ -101,10 +161,48 @@ ggplot(aes(x = days, linetype = curr_treat)) +
   labs(y = "predicted height (cm)")
 ```
 
+Just slopes.
+
+```{r}
+o_slopes <- emtrends(o_ht, ~ hist_treat*curr_treat, var = "days", level = 0.84)
+o_slope_df <- 
+  o_slopes %>% 
+  as_tibble() %>% 
+  # back-transform linear slope to exponential growth rate?
+  mutate(across(c(days.trend, lower.CL, upper.CL), ~exp(.x)))
+
+ggplot(o_slope_df) +
+  geom_pointrange(aes(
+    x = curr_treat,
+    color = hist_treat,
+    y = days.trend,
+    ymin = lower.CL,
+    ymax = upper.CL
+  ),
+  position = position_dodge(width = 0.2)) +
+  labs(
+    title = "Oats",
+    x = "Current treatment",
+    color = "Historical treatment",
+    y = "Linear growth rate (cm/day)"
+  )
+```
+
+
+# References
+Payton, M. E., M. H. Greenstone, and N. Schenker. 2003. Overlapping confidence intervals or standard error intervals: What do they mean in terms of statistical significance? Journal of Insect Science 3:1–6.
+
+
 
 # Reproducibility
 
-<details><summary>Reproducibility receipt</summary>
+<details>
+
+<summary>
+
+Reproducibility receipt
+
+</summary>
 
 ```{r}
 ## datetime

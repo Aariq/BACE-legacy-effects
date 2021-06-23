@@ -36,7 +36,7 @@ Approach: redundancy analysis
 
 ```{r}
 nutr <- as.matrix(select(oat_nutr, c(n, ca, k, mg, p, al, b, cu, fe, mn, zn)))
-oat_rda <- rda(nutr ~ historical*current + august_herbivory, data = oat_nutr, scale = TRUE)
+oat_rda <- rda(nutr ~ historical*current + aug_herbivory, data = oat_nutr, scale = TRUE)
 ```
 
 ```{r}

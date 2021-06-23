@@ -62,55 +62,48 @@ clean_oat_nutr <- function(oat_nutr_raw) {
   oat_nutr_raw %>% 
     clean_names() %>% 
     slice(-1) %>%  #remove row with units
-    mutate(across(n:zn, ~str_remove(.x, "<"))) %>% #just include numbers < LOQ
-    mutate(across(n:grainharvest, ~as.numeric(.x))) %>% 
-    mutate(
-      current = fct_recode(
-        as.character(current),
-        "ambient" = "0",
-        "75%" = "25",
-        "50%" = "50"
-      ),
-      historical = fct_recode(
-        as.character(historical),
-        "high" = "0",
-        "medium" = "25",
-        "medium" = "35", #fix typo
-        "low" = "50"
-      )
-    )
+    rename(aug_ht = pot_mean_august_height,
+           aug_herbivory = august_herbivory,
+           harvest_mass = grainharvest,
+           mass_above = pot_mean_aboveground_mass) %>% 
+    select(-id) %>% 
+    #fix typo
+    mutate(historical = if_else(historical == 35, 25, historical))
 }
+  
 
 clean_bean_nutr <- function(bean_nutr_raw) {
   bean_nutr_raw %>% 
     clean_names() %>% 
     slice(-1) %>%  #remove row with units
-    mutate(across(n:zn, ~str_remove(.x, "<"))) %>%  #just include numbers < LOQ
-    mutate(across(n:beanmass, ~as.numeric(.x))) %>% 
-    rename(current = current_moisture, historical = historical_treatment) %>% 
-    mutate(
-      current = fct_recode(
-        as.character(current),
-        "ambient" = "0",
-        "75%" = "25",
-        "50%" = "50"
-      ),
-      historical = fct_recode(
-        as.character(historical),
-        "high" = "0",
-        "medium" = "25",
-        "low" = "50"
-      )
-    )
+    rename(current = current_moisture,
+           historical = historical_treatment,
+           aug_ht = august_height,
+           aug_herbivory = august_herbivory,
+           harvest_mass = beanmass) %>% 
+    select(-id)
 }
+
 
 clean_kale_nutr <- function(kale_nutr_raw) {
   kale_nutr_raw %>% 
-    clean_names() %>% 
+    clean_names() %>%
     slice(-1) %>%  #remove row with units
+    rename(current = current_moisture,
+           historical = historical_treatment,
+           aug_ht = pot_mean_aug_height,
+           aug_herbivory = august_herbivory,
+           mass_above = abvmass,
+           mass_below = pot_mean_aug_blw,
+           mass_total = total_potmean_aug) %>% 
+    select(-num_range("x", 23:28), -id)
+}
+  
+clean_nutr <- function(x){
+  x %>% 
+    select(current, historical, plot, pot_number, maine_id, n:zn, aug_ht, aug_herbivory, everything()) %>% 
     mutate(across(n:zn, ~str_remove(.x, "<"))) %>%  #just include numbers < LOQ
-    mutate(across(n:august_herbivory, ~as.numeric(.x))) %>% 
-    rename(current = current_moisture, historical = historical_treatment) %>% 
+    mutate(across(n:aug_herbivory, ~as.numeric(.x))) %>%
     mutate(
       current = fct_recode(
         as.character(current),
@@ -124,5 +117,15 @@ clean_kale_nutr <- function(kale_nutr_raw) {
         "medium" = "25",
         "low" = "50"
       )
-    )
+    ) %>%
+    mutate(pot_number = str_extract(pot_number, "\\d+")) %>%
+    mutate(
+      plot_id = glue::glue(
+        "kale_plot{plot}_{historical}"
+      ),
+      pot_id = glue::glue(
+        "{plot_id}_pot{pot_number}"
+      )
+    ) %>%
+    mutate(across(ends_with("_id"), as.character))
 }

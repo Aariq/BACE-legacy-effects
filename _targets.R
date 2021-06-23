@@ -41,9 +41,12 @@ tar_plan(
   oat_nutr_raw = read_excel(nutr_file, sheet = "Oats(pot)"),
   bean_nutr_raw = read_excel(nutr_file, sheet = "Beans (pot)"),
   kale_nutr_raw = read_excel(nutr_file, sheet = "Kale (Latepot)"),
-  bean_nutr = clean_bean_nutr(bean_nutr_raw),
-  oat_nutr = clean_oat_nutr(oat_nutr_raw),
-  kale_nutr = clean_kale_nutr(kale_nutr_raw),
-  
+  bean_nutr_clean = clean_bean_nutr(bean_nutr_raw),
+  oat_nutr_clean = clean_oat_nutr(oat_nutr_raw),
+  kale_nutr_clean = clean_kale_nutr(kale_nutr_raw),
+  bean_nutr = clean_nutr(bean_nutr_clean),
+  oat_nutr = clean_nutr(oat_nutr_clean),
+  kale_nutr = clean_nutr(kale_nutr_clean),
+
   tar_render(nutrient_rda, "doc/nutrient_rda.Rmd")
 )

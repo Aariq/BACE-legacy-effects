@@ -16,6 +16,7 @@ library(tidyverse)
 library(targets)
 library(vegan)
 library(RVAideMemoire)
+set.seed(9872) #for reproducibility of permutation tests
 ```
 
 ```{r load-targets, include=FALSE}
@@ -49,12 +50,11 @@ A brief description of how RDA works from @herveMultivariateAnalysisMultiple2018
 ## Oats
 
 ```{r}
-nutr <- as.matrix(select(oat_nutr, c(n, ca, k, mg, p, al, b, cu, fe, mn, zn)))
 oat_rda <-
   rda(
-    nutr ~ historical * current + jul_herbivory + late_herbivory,
+    oat_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
     data = oat_nutr,
-    scale = TRUE
+    scale = FALSE #already scaled and centered
   )
 ```
 
@@ -62,8 +62,8 @@ oat_rda <-
 MVA.synt(oat_rda)
 ```
 
-The experimental design (current treatment, historical treatment, their interaction, and herbivory) explain \~234% of variation in nutrients.
-The first constrained axis captures \~67% of *that* variance.
+The experimental design (current treatment, historical treatment, their interaction, and herbivory) explain \~34% of variation in nutrients.
+The first two constrained axes capture \~83% of *that* variance. So, about `r round(.8256*.3388*100, 2)`% of the constrained variance are explained by the first two axes 
 
 ### Permutation Test
 
@@ -123,15 +123,39 @@ MVA.plot(
 
 Axis 1 is positively correlated with Mn, B, and Ca and negatively correlated with P, K, Cu, Zn, Fe.  Axis 2 is positively correlated with N and negatively correlated with Al.
 
+```{r}
+library(ggpubr)
+```
+
+
+```{r}
+#extract scores
+oat_scores <- MVA.scores(oat_rda)
+#combine with experimental treatments
+oat_score_df <- bind_cols(oat_nutr, oat_scores$coord)
+```
+
+With convex hulls
+```{r}
+ggplot(oat_score_df, aes(x = `Constr. comp. 1`, y = `Constr. comp. 2`,
+                         fill = current,
+                         color = current,
+                         linetype = current)) +
+  stat_chull(geom = "polygon", alpha = 0.4, color = "black") +
+  geom_point(aes(shape = jul_herbivory), color = "black") +
+  theme_bw() +
+  theme(panel.grid= element_blank())
+```
+
+
 ## Beans
 
 ```{r}
-nutr <- as.matrix(select(bean_nutr, c(n, ca, k, mg, p, al, b, cu, fe, mn, zn)))
 bean_rda <-
   rda(
-    nutr ~ historical * current + jul_herbivory + late_herbivory,
+    bean_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
     data = bean_nutr,
-    scale = TRUE
+    scale = FALSE
   )
 ```
 
@@ -195,10 +219,9 @@ Axis 1 is positively correlated with mn and negatively correlated with Zn, K, P,
 ## Kale
 
 ```{r}
-nutr <- as.matrix(select(kale_nutr, c(n, ca, k, mg, p, al, b, cu, fe, mn, zn)))
 kale_rda <-
   rda(
-    nutr ~ historical * current  + jul_herbivory + late_herbivory,
+    kale_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
     data = kale_nutr,
     scale = TRUE
   )

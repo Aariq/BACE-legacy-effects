@@ -118,7 +118,12 @@ clean_nutr <- function(nutr, herbivory_data, species){
         "{plot_id}_pot{pot_number}"
       )
     ) %>%
-    mutate(across(ends_with("_id"), as.character))
+    mutate(across(ends_with("_id"), as.character)) %>% 
+    # prep for nutrient analysis by scaling and creating a matrix column
+    mutate(across(c(n, ca, k, mg, p, al, b, cu, fe, mn, zn), ~scale(.x), .names = "{.col}_scaled")) %>%
+    mutate(nutr = as.matrix(select(., ends_with("_scaled"))))
   
   left_join(nutr_clean, herbivory_data)
 }
+
+

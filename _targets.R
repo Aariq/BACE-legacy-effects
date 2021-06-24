@@ -16,7 +16,6 @@ tar_plan(
   longdata_clean = wrangle_longdata(longdata_raw),
   longdata = calc_growth(longdata_clean),
   
-  
   # eda
   longfig = make_longfig(longdata),
   tar_render(eda, "doc/eda.Rmd"),

@@ -35,6 +35,10 @@ withr::with_dir(here::here(), {
 
 Model:
 
+```{r}
+formula(k_ht)
+```
+
 
 ```{r}
 Anova(k_ht)
@@ -77,6 +81,11 @@ ggplot(k_slope_df) +
 ```
 
 ## Beans
+
+```{r}
+formula(b_ht)
+```
+
 
 ```{r}
 Anova(b_ht)
@@ -134,11 +143,17 @@ ggplot(b_slope_df) +
 ## Oats
 
 ```{r}
+formula(o_ht)
+```
+
+
+```{r}
 Anova(o_ht)
 ```
 
 -   days = significant growth (change in height over time)
 -   july_herbivory = significant effect of herbivory on height
+-   curr_treat = different intercepts for different treatments
 -   days:curr_treat = different slopes (height over time) for different current treatments
 -   days:hist_treat:curr_treat = hard to interpret, especially since no main effects
 

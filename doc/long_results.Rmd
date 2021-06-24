@@ -5,6 +5,9 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   html_document:
     code_folding: hide
+    toc: true
+    toc_float: true
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -39,13 +42,12 @@ Model:
 formula(k_ht)
 ```
 
-
 ```{r}
 Anova(k_ht)
 ```
 
-- days = significant growth (slope of height over time) 
-- days:hist_treat:curr_treat = hard to interpret, especially since no main effects
+-   days = significant growth (slope of height over time)
+-   days:hist_treat:curr_treat = hard to interpret, especially since no main effects
 
 ```{r}
 ggplot(my_augment(k_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
@@ -53,7 +55,8 @@ ggplot(my_augment(k_ht), aes(x = days, color = hist_treat, linetype = curr_treat
   labs(y = "log(fitted height)")
 ```
 
-Since the difference in the slopes is the focus, I can plot just the slopes for each line, with confidence intervals.  95% CIs are typical, but here I'm plotting 84% CIs which overlap about 95% of the time for random samples from the same population (i.e. null hypothesis) (Payton et al. 2003).
+Since the difference in the slopes is the focus, I can plot just the slopes for each line, with confidence intervals.
+95% CIs are typical, but here I'm plotting 84% CIs which overlap about 95% of the time for random samples from the same population (i.e. null hypothesis) [@paytonOverlappingConfidenceIntervals2003].
 
 ```{r}
 k_slopes <- emtrends(k_ht, ~ hist_treat*curr_treat, var = "days", level = 0.84)
@@ -85,7 +88,6 @@ ggplot(k_slope_df) +
 ```{r}
 formula(b_ht)
 ```
-
 
 ```{r}
 Anova(b_ht)
@@ -146,7 +148,6 @@ ggplot(b_slope_df) +
 formula(o_ht)
 ```
 
-
 ```{r}
 Anova(o_ht)
 ```
@@ -203,11 +204,10 @@ ggplot(o_slope_df) +
   )
 ```
 
-
 # References
-Payton, M. E., M. H. Greenstone, and N. Schenker. 2003. Overlapping confidence intervals or standard error intervals: What do they mean in terms of statistical significance? Journal of Insect Science 3:1–6.
 
-
+::: {#refs}
+:::
 
 # Reproducibility
 

@@ -5,6 +5,8 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   html_document:
     code_folding: hide
+    toc: true
+    toc_float: true
 bibliography: references.bib
 ---
 
@@ -24,7 +26,10 @@ withr::with_dir(here::here(), {
   tar_load(c(
     oat_nutr,
     bean_nutr,
-    kale_nutr
+    kale_nutr,
+    oat_rda,
+    bean_rda,
+    kale_rda
   ))
 })
 ```
@@ -50,13 +55,20 @@ A brief description of how RDA works from @herveMultivariateAnalysisMultiple2018
 ## Oats
 
 ```{r}
-oat_rda <-
-  rda(
-    oat_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
-    data = oat_nutr,
-    scale = FALSE #already scaled and centered
-  )
+# oat_rda <-
+#   rda(
+#     oat_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
+#     data = oat_nutr,
+#     scale = FALSE #already scaled and centered
+#   )
 ```
+
+Formula:
+
+```{r}
+oat_rda$call
+```
+
 
 ```{r}
 MVA.synt(oat_rda)
@@ -135,7 +147,21 @@ oat_scores <- MVA.scores(oat_rda)
 oat_score_df <- bind_cols(oat_nutr, oat_scores$coord)
 ```
 
-With convex hulls
+With convex hulls for herbivory
+
+```{r}
+ggplot(oat_score_df, aes(x = `Constr. comp. 1`, y = `Constr. comp. 2`,
+                         fill = jul_herbivory,
+                         color = jul_herbivory,
+                         linetype = jul_herbivory)) +
+  stat_chull(geom = "polygon", alpha = 0.4, color = "black") +
+  geom_point(aes(shape = current), color = "black") +
+  theme_bw() +
+  theme(panel.grid= element_blank())
+```
+
+With convex hulls for current treatment
+
 ```{r}
 ggplot(oat_score_df, aes(x = `Constr. comp. 1`, y = `Constr. comp. 2`,
                          fill = current,
@@ -147,17 +173,30 @@ ggplot(oat_score_df, aes(x = `Constr. comp. 1`, y = `Constr. comp. 2`,
   theme(panel.grid= element_blank())
 ```
 
+What is that big divide?
+```{r}
+oat_score_df %>% filter(`Constr. comp. 1` < 0) %>% filter(jul_herbivory == "some") %>% count(plot)
+oat_score_df %>% filter(`Constr. comp. 1` > 0) %>% count(plot)
+```
+
 
 ## Beans
 
 ```{r}
-bean_rda <-
-  rda(
-    bean_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
-    data = bean_nutr,
-    scale = FALSE
-  )
+# bean_rda <-
+#   rda(
+#     bean_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
+#     data = bean_nutr,
+#     scale = FALSE
+#   )
 ```
+
+Formula:
+
+```{r}
+bean_rda$call
+```
+
 
 ```{r}
 MVA.synt(bean_rda)
@@ -219,12 +258,18 @@ Axis 1 is positively correlated with mn and negatively correlated with Zn, K, P,
 ## Kale
 
 ```{r}
-kale_rda <-
-  rda(
-    kale_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
-    data = kale_nutr,
-    scale = TRUE
-  )
+# kale_rda <-
+#   rda(
+#     kale_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
+#     data = kale_nutr,
+#     scale = TRUE
+#   )
+```
+
+Formula:
+
+```{r}
+kale_rda$call
 ```
 
 

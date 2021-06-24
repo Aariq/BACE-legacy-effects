@@ -57,6 +57,12 @@ tar_plan(
   kale_herb = calc_herbivory(kale_plant_raw, "kale"),
   kale_nutr_clean = clean_kale_nutr(kale_nutr_raw),
   kale_nutr = clean_nutr(kale_nutr_clean, kale_herb, "kale"),
+  
+  #RDAs
+  
+  oat_rda = fit_rda(oat_nutr),
+  bean_rda = fit_rda(bean_nutr),
+  kale_rda = fit_rda(kale_nutr),
 
   tar_render(nutrient_rda, "doc/nutrient_rda.Rmd")
 )

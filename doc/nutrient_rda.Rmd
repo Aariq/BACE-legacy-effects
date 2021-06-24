@@ -32,16 +32,7 @@ withr::with_dir(here::here(), {
 
 Do historical and current treatments (and their interaction) differ in nutrient **concentration**?
 
-Approach: redundancy analysis
-
-**NOTE** Currently `aug_cum_herbivory` *includes* `jul_herbivory`.
-That is, it represents cumulative herbivory by august.
-It would be ideal to separate early herbivory (small mammals) from late herbivory (insects) and include both.
-For now I'll just use `jul_herbivory`.
-
-`*_herbivory` is a categorical variable that is "some" if any of the plants experienced any amount of herbivory.
-`*_herbivory_mean` is a numeric pot-level average of herbivory events (for `jul_herbivory_mean`, at least).
-`aug_cum_herbivory_mean` is taken directly from the raw data, and I'm not sure how the pot-level means were calculated.
+Approach: redundancy analysis (RDA)
 
 A brief description of how RDA works from @herveMultivariateAnalysisMultiple2018:
 
@@ -52,13 +43,16 @@ A brief description of how RDA works from @herveMultivariateAnalysisMultiple2018
 > The 'constrained PCA' is applied on the fitted values of the regression and summarizes the variation of the chemical data explained by the controlled variables.
 > The 'unconstrained PCA' is applied on the residuals of the regression and summarizes the variation that is not related to the controlled variables.
 
+**NOTE**
+`jul_herbivory` is cumulative herbivory in July, which was small-mammal herbivory.  `late_herbivory` is the cumulative herbivory in August minus cumulative herbivory in July.  Late herbivory was insect herbivory.  So `jul_herbivory` is small mammal herbivory and `late_herbivory` is just the insect herbivory.
+
 ## Oats
 
 ```{r}
 nutr <- as.matrix(select(oat_nutr, c(n, ca, k, mg, p, al, b, cu, fe, mn, zn)))
 oat_rda <-
   rda(
-    nutr ~ historical * current + jul_herbivory,
+    nutr ~ historical * current + jul_herbivory + late_herbivory,
     data = oat_nutr,
     scale = TRUE
   )
@@ -68,8 +62,8 @@ oat_rda <-
 MVA.synt(oat_rda)
 ```
 
-The experimental design (current treatment, historical treatment, their interaction, and herbivory) explain \~20% of variation in nutrients.
-The first constrained axis captures \~62% of *that* variance.
+The experimental design (current treatment, historical treatment, their interaction, and herbivory) explain \~234% of variation in nutrients.
+The first constrained axis captures \~67% of *that* variance.
 
 ### Permutation Test
 
@@ -83,28 +77,13 @@ Test for significance that this amount of explained variance is higher than the 
 anova(oat_rda)
 ```
 
-The model does not explain significantly more variance in nutrients than a null model.
-I think we should probably stop here.
-If this test *were* significant, we could do a marginal hypothesis test for effects of each predictor (type II ANOVA):
+The model does explain a significant proportion of variance.  Now we can do a marginal hypothesis test (type II ANOVA)
 
 ```{r}
 MVA.anova(oat_rda)
 ```
 
-But I don't think it's appropriate to trust these results since the `anova()` was non-significant.
-
-If we use cumulative herbivory in August, it is significant though.
-Would be good to have separate columns for early and late herbivory.
-
-```{r}
-oat_rda2 <-
-  rda(
-    nutr ~ historical * current + aug_cum_herbivory,
-    data = oat_nutr,
-    scale = TRUE
-  )
-anova(oat_rda2)
-```
+Current treatment and early (small mammal) herbivory significantly affect nutrients in oats.
 
 ### Plots
 
@@ -118,10 +97,21 @@ MVA.plot(
   barycenters = FALSE,
   stars = FALSE,
   contours = TRUE,
-  legend.title = "current",
+  legend.title = "Current Treatment",
   xlim = c(-5, 5)
 )
-
+MVA.plot(
+  oat_rda,
+  "score",
+  fac = oat_nutr$jul_herbivory,
+  col = c("black", "red"),
+  legend = TRUE,
+  barycenters = FALSE,
+  stars = FALSE,
+  contours = TRUE,
+  legend.title = "July Herbivory",
+  xlim = c(-5, 5)
+)
 MVA.plot(
   oat_rda,
   "corr",
@@ -131,23 +121,7 @@ MVA.plot(
 )
 ```
 
-I suspect the division is more related to *late* herbivory.
-I bet if we added this to the model, it would be significant.
-
-```{r}
-MVA.plot(
-  oat_rda,
-  "score",
-  fac = oat_nutr$aug_cum_herbivory,
-  col = c("black", "red"),
-  legend = TRUE,
-  barycenters = FALSE,
-  stars = FALSE,
-  contours = TRUE,
-  legend.title = "Aug. cumulative herbivory",
-  xlim = c(-5, 5)
-)
-```
+Axis 1 is positively correlated with Mn, B, and Ca and negatively correlated with P, K, Cu, Zn, Fe.  Axis 2 is positively correlated with N and negatively correlated with Al.
 
 ## Beans
 
@@ -155,7 +129,7 @@ MVA.plot(
 nutr <- as.matrix(select(bean_nutr, c(n, ca, k, mg, p, al, b, cu, fe, mn, zn)))
 bean_rda <-
   rda(
-    nutr ~ historical * current + jul_herbivory,
+    nutr ~ historical * current + jul_herbivory + late_herbivory,
     data = bean_nutr,
     scale = TRUE
   )
@@ -165,21 +139,20 @@ bean_rda <-
 MVA.synt(bean_rda)
 ```
 
-\~28% of variation explained by "experiment"
+\~33% of variation explained by "experiment"
 
-### Overall ANOVA
+
+### Permutation Test
 
 ```{r}
 anova(bean_rda)
 ```
 
-### Permutation Test
-
 ```{r}
 MVA.anova(bean_rda)
 ```
 
-current conditions and july herbivory significantly affect nutrients.
+current treatment and july herbivory significantly affect nutrients.
 
 ### Plots
 
@@ -217,23 +190,26 @@ MVA.plot(
 )
 ```
 
+Axis 1 is positively correlated with mn and negatively correlated with Zn, K, P, and N.  Axis 2 negatively correlated with N.
+
 ## Kale
 
 ```{r}
 nutr <- as.matrix(select(kale_nutr, c(n, ca, k, mg, p, al, b, cu, fe, mn, zn)))
 kale_rda <-
   rda(
-    nutr ~ historical * current  + jul_herbivory,
+    nutr ~ historical * current  + jul_herbivory + late_herbivory,
     data = kale_nutr,
     scale = TRUE
   )
 ```
 
+
 ```{r}
 MVA.synt(kale_rda)
 ```
 
-\~28% of variance explained by "experiment"
+\~30% of variance explained by "experiment"
 
 ### Permutation Test
 
@@ -246,7 +222,7 @@ MVA.anova(kale_rda)
 ```
 
 historical and current conditions affect nutrition.
-Herbivory is also significant
+Early herbivory is also significant
 
 ### Plots
 

@@ -38,15 +38,26 @@ tar_plan(
   
   #Nutrient data
   tar_target(nutr_file, here("data", "three_period_data_5_13_2021.xlsx"), format = "file"),
+  ### Oats
   oat_nutr_raw = read_excel(nutr_file, sheet = "Oats(pot)"),
-  bean_nutr_raw = read_excel(nutr_file, sheet = "Beans (pot)"),
-  kale_nutr_raw = read_excel(nutr_file, sheet = "Kale (Latepot)"),
-  bean_nutr_clean = clean_bean_nutr(bean_nutr_raw),
+  oat_plant_raw = read_excel(nutr_file, "Oats (plant)"),
+  oat_herb = calc_herbivory(oat_plant_raw, "oats"),
   oat_nutr_clean = clean_oat_nutr(oat_nutr_raw),
+  oat_nutr = clean_nutr(oat_nutr_clean, oat_herb, "oats"),
+  
+  ### Beans
+  bean_nutr_raw = read_excel(nutr_file, sheet = "Beans (pot)"),
+  bean_plant_raw = read_excel(nutr_file, sheet = "Beans (plant)"),
+  bean_herb = calc_herbivory(bean_plant_raw, "beans"),
+  bean_nutr_clean = clean_bean_nutr(bean_nutr_raw),
+  bean_nutr = clean_nutr(bean_nutr_clean, bean_herb, "beans"),
+  
+  ### Kale
+  kale_nutr_raw = read_excel(nutr_file, sheet = "Kale (Latepot)"),
+  kale_plant_raw = read_excel(nutr_file, sheet = "Kale (plant)"),
+  kale_herb = calc_herbivory(kale_plant_raw, "kale"),
   kale_nutr_clean = clean_kale_nutr(kale_nutr_raw),
-  bean_nutr = clean_nutr(bean_nutr_clean, longdata),
-  oat_nutr = clean_nutr(oat_nutr_clean, longdata),
-  kale_nutr = clean_nutr(kale_nutr_clean, longdata),
+  kale_nutr = clean_nutr(kale_nutr_clean, kale_herb, "kale"),
 
   tar_render(nutrient_rda, "doc/nutrient_rda.Rmd")
 )

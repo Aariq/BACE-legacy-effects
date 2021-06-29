@@ -21,7 +21,7 @@ tar_plan(
   growth_fig = make_growth_fig(longdata),
   tar_target(growth_fig_png, ggsave(here("doc", "figs", "growth.png"), growth_fig), format = "file"),
   tar_target(growth_fig_pdf, ggsave(here("doc", "figs", "growth.pdf"), growth_fig), format = "file"),
-  tar_render(eda, "doc/eda.Rmd"),
+  tar_render(eda, "doc/growth_exploratory.Rmd"),
   
   # establish cutoffs for exponential growth period
   oat_cutoff = ymd("2018-08-07"),

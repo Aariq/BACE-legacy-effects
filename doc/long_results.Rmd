@@ -19,6 +19,9 @@ library(lme4)
 library(car)
 library(tidyverse)
 library(emmeans)
+library(broom)
+library(broom.mixed)
+source(here::here("R", "plot_fitted.R"))
 ```
 
 ```{r}
@@ -51,7 +54,7 @@ Anova(k_ht)
 
 ```{r}
 ggplot(my_augment(k_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
-  geom_line(aes(y = .fitted)) +
+  stat_summary(geom = "line", aes(y = .fitted)) +
   labs(y = "log(fitted height)")
 ```
 
@@ -100,7 +103,7 @@ plot
 
 ```{r}
 ggplot(my_augment(b_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
-  geom_line(aes(y = .fitted)) +
+  stat_summary(geom = "line", aes(y = .fitted)) +
   labs(y = "log(fitted height)")
 ```
 
@@ -144,6 +147,8 @@ ggplot(b_slope_df) +
 
 ## Oats
 
+Here we use untransformed height as a response because the residuals of this model better met assumptions of normality and heteroskedasticity compared to log(height).
+
 ```{r}
 formula(o_ht)
 ```
@@ -154,13 +159,14 @@ Anova(o_ht)
 
 -   days = significant growth (change in height over time)
 -   july_herbivory = significant effect of herbivory on height
+-   house = significant blocking effect (weeds?)
 -   curr_treat = different intercepts for different treatments
 -   days:curr_treat = different slopes (height over time) for different current treatments
 -   days:hist_treat:curr_treat = hard to interpret, especially since no main effects
 
 ```{r}
 ggplot(my_augment(o_ht), aes(x = days, color = hist_treat, linetype = curr_treat)) + 
-  geom_line(aes(y = .fitted)) +
+  stat_summary(geom = "line", aes(y = .fitted)) +
   labs(y = "predicted height (cm)")
 ```
 

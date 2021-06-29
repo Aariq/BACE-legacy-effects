@@ -46,7 +46,13 @@ wrangle_longdata <- function(longdata_raw) {
         "{pot_id}_{plant}"
       )
     ) %>%
-    mutate(across(ends_with("_id"), as.character))
+    mutate(across(ends_with("_id"), as.character)) %>% 
+    # create "house" variable
+    mutate(house = case_when(
+      plot %in% 1:3 ~ "1",
+      plot %in% 4:6 ~ "2",
+      plot %in% 7:9 ~ "3"
+    ))
 }
 
 calc_growth <- function(longdata) {

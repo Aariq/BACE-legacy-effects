@@ -119,8 +119,16 @@ clean_nutr <- function(nutr, herbivory_data, species){
       )
     ) %>%
     mutate(across(ends_with("_id"), as.character)) %>% 
+    # add "house" variable
+    mutate(house = case_when(
+      plot %in% 1:3 ~ "1",
+      plot %in% 4:6 ~ "2",
+      plot %in% 7:9 ~ "3"
+    )) %>% 
     # prep for nutrient analysis by scaling and creating a matrix column
-    mutate(across(c(n, ca, k, mg, p, al, b, cu, fe, mn, zn), ~scale(.x), .names = "{.col}_scaled")) %>%
+    mutate(across(c(n, ca, k, mg, p, al, b, cu, fe, mn, zn),
+                  ~scale(.x),
+                  .names = "{.col}_scaled")) %>%
     mutate(nutr = as.matrix(select(., ends_with("_scaled"))))
   
   left_join(nutr_clean, herbivory_data)

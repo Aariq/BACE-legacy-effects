@@ -14,6 +14,8 @@ knitr::opts_chunk$set(echo = FALSE)
 library(targets)
 library(tarchetypes)
 library(tidyverse)
+library(lubridate)
+source(here("R", "eda_plots.R"))
 ```
 
 ```{r}
@@ -60,59 +62,47 @@ kale <-  longdata %>% filter(species == "kale")
 oats <-  longdata %>% filter(species == "oats")
 ```
 
+## Kale
+```{r}
+make_growth_panel(kale, range(kale$date))
+```
+
 ## Beans
 
 ```{r}
-ggplot(beans, aes(x = date, y = height)) +
-  stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line", fun = "mean") +
-  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d") +
-  scale_y_continuous("Height (cm)") +
-  scale_color_discrete("Historical") +
-  scale_linetype_discrete("Current") +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+make_growth_panel(beans, range(beans$date))
 ```
 
 Looks like 7/31 would be a good cutoff.
 
 ```{r}
-beans_2 <- beans %>% filter(date <= ymd("2018-07-31"))
-ggplot(beans_2, aes(x = date, y = height)) +
-  stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line", fun = "mean") +
-  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d") +
-  scale_y_continuous("Height (cm)") +
-  scale_color_discrete("Historical") +
-  scale_linetype_discrete("Current") +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+make_growth_panel(beans, c(min(beans$date), as.POSIXct(ymd("2018-07-31"))))
 ```
 
 ## Oats
 
 ```{r}
-ggplot(oats, aes(x = date, y = height)) +
-  stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line", fun = "mean") +
-  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d") +
-  scale_y_continuous("Height (cm)") +
-  scale_color_discrete("Historical") +
-  scale_linetype_discrete("Current") +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+make_growth_panel(oats, range(oats$date))
 ```
 
 Less clear for oats---it seems like the end of growth depends on the treatment with oats in current dry conditions not really leveling off in size until the very end and in current ambient conditions growth is leveling off by 8/07.
 
 ```{r}
-oats_2 <- oats %>% filter(date <= ymd("2018-08-07"))
-ggplot(oats_2, aes(x = date, y = height)) +
-  stat_summary(aes(color = hist_treat, linetype = curr_treat), geom = "line", fun = "mean") +
-  scale_x_datetime("", date_breaks = "1 week", date_labels = "%m/%d") +
-  scale_y_continuous("Height (cm)") +
-  scale_color_discrete("Historical") +
-  scale_linetype_discrete("Current") +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+make_growth_panel(oats, c(min(oats$date), as.POSIXct(ymd("2018-08-07"))))
 ```
+
+# Publication quality plot
+
+See also `doc/figs/growth.png`
+
+```{r}
+cap <- "Weekly change in height of kale (a), beans (b), and oats (c)."
+```
+
+```{r growth, fig.cap=cap}
+tar_read(growth_fig)
+```
+
 
 
 

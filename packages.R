@@ -18,6 +18,7 @@ library(RVAideMemoire)
 library(patchwork)
 library(scales)
 library(ggplot2)
+library(emmeans)
 
 conflict_prefer("lag", "dplyr")
 conflict_prefer("filter", "dplyr")

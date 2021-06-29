@@ -35,6 +35,13 @@ tar_plan(
   #model validation
   tar_render(model_validation, "doc/model_validation.Rmd"),
   
+  #plot slopes
+  k_slopes = plot_slopes_panel(k_ht),
+  b_slopes = plot_slopes_panel(b_ht),
+  o_slopes = plot_slopes_panel(o_ht, exp = FALSE),
+  slopes_plot = plot_slopes(k_slopes, b_slopes, o_slopes),
+  tar_target(slopes_fig_png, ggsave(here("doc", "figs", "slopes.png"), slopes_plot), format = "file"),
+  tar_target(slopes_fig_pdf, ggsave(here("doc", "figs", "slopes.pdf"), slopes_plot), format = "file"),
   #Longitudinal Results
   tar_render(long_results, "doc/long_results.Rmd"),
   

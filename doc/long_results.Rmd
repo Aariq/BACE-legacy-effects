@@ -62,28 +62,7 @@ Since the difference in the slopes is the focus, I can plot just the slopes for 
 95% CIs are typical, but here I'm plotting 84% CIs which overlap about 95% of the time for random samples from the same population (i.e. null hypothesis) [@paytonOverlappingConfidenceIntervals2003].
 
 ```{r}
-k_slopes <- emtrends(k_ht, ~ hist_treat*curr_treat, var = "days", level = 0.84)
-k_slope_df <- 
-  k_slopes %>% 
-  as_tibble() %>% 
-  # back-transform linear slope to exponential growth rate?
-  mutate(across(c(days.trend, lower.CL, upper.CL), ~exp(.x)))
-
-ggplot(k_slope_df) +
-  geom_pointrange(aes(
-    x = curr_treat,
-    color = hist_treat,
-    y = days.trend,
-    ymin = lower.CL,
-    ymax = upper.CL
-  ),
-  position = position_dodge(width = 0.2)) +
-  labs(
-    title = "Kale",
-    x = "Current treatment",
-    color = "Historical treatment",
-    y = "Exponential growth rate"
-  )
+tar_read(k_slopes)
 ```
 
 ## Beans
@@ -121,28 +100,7 @@ ggplot(aes(x = days, color = hist_treat)) +
 Only slopes:
 
 ```{r}
-b_slopes <- emtrends(b_ht, ~ hist_treat*curr_treat, var = "days", level = 0.84)
-b_slope_df <- 
-  b_slopes %>% 
-  as_tibble() %>% 
-  # back-transform linear slope to exponential growth rate?
-  mutate(across(c(days.trend, lower.CL, upper.CL), ~exp(.x)))
-
-ggplot(b_slope_df) +
-  geom_pointrange(aes(
-    x = curr_treat,
-    color = hist_treat,
-    y = days.trend,
-    ymin = lower.CL,
-    ymax = upper.CL
-  ),
-  position = position_dodge(width = 0.2)) +
-  labs(
-    title = "Beans",
-    x = "Current treatment",
-    color = "Historical treatment",
-    y = "Exponential growth rate"
-  )
+tar_read(b_slopes)
 ```
 
 ## Oats
@@ -186,28 +144,13 @@ ggplot(aes(x = days, linetype = curr_treat)) +
 Just slopes.
 
 ```{r}
-o_slopes <- emtrends(o_ht, ~ hist_treat*curr_treat, var = "days", level = 0.84)
-o_slope_df <- 
-  o_slopes %>% 
-  as_tibble() %>% 
-  # back-transform linear slope to exponential growth rate?
-  mutate(across(c(days.trend, lower.CL, upper.CL), ~exp(.x)))
+tar_read(o_slopes)
+```
 
-ggplot(o_slope_df) +
-  geom_pointrange(aes(
-    x = curr_treat,
-    color = hist_treat,
-    y = days.trend,
-    ymin = lower.CL,
-    ymax = upper.CL
-  ),
-  position = position_dodge(width = 0.2)) +
-  labs(
-    title = "Oats",
-    x = "Current treatment",
-    color = "Historical treatment",
-    y = "Linear growth rate (cm/day)"
-  )
+# Publication quality figure
+
+```{r}
+tar_read(slopes_plot)
 ```
 
 # References

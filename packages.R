@@ -22,6 +22,7 @@ library(emmeans)
 library(ggpubr)
 library(ggrepel)
 library(glue)
+library(ggpmisc)
 
 conflict_prefer("lag", "dplyr")
 conflict_prefer("filter", "dplyr")

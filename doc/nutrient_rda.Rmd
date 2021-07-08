@@ -20,6 +20,7 @@ library(vegan)
 library(RVAideMemoire)
 library(ggpubr)
 library(ggrepel)
+library(ggpmisc)
 set.seed(9872) #for reproducibility of permutation tests
 ```
 
@@ -100,9 +101,9 @@ oat_score_df <- bind_cols(oat_nutr, oat_scores$coord)
 ```
 
 ```{r}
-#extract loadings
-oat_load_df <-
-  MVA.load(oat_rda)$loads %>% 
+#extract correlations
+oat_cor_df <-
+  MVA.cor(oat_rda)$corr %>% 
   as_tibble(rownames = "nutrient") %>% 
   #format nutrients for plotting
   mutate(nutrient = str_extract(nutrient, "(?<=nutr\\.)\\w{1,2}(?=_scaled)")) %>% 
@@ -113,6 +114,13 @@ oat_load_df <-
          yplus = abs(m * xplus)) %>% 
   mutate(xplus = ifelse(sign(`Constr. comp. 1`) == -1, xplus*-1, xplus),
          yplus = ifelse(sign(`Constr. comp. 2`) == -1, yplus*-1, yplus))
+```
+
+```{r}
+# threshold of correlation
+thresh = 0.5
+oat_cor_df <- oat_cor_df %>% 
+  mutate(thresh = abs(`Constr. comp. 1`) > thresh | abs(`Constr. comp. 2`) > thresh)
 ```
 
 
@@ -131,9 +139,13 @@ ggplot(oat_score_df, aes(x = `Constr. comp. 1`, y = `Constr. comp. 2`,
   scale_linetype_manual("Current", values = c("solid", "longdash", "dotted")) +
   scale_shape_discrete("Historical", solid = FALSE) +
   guides(fill = guide_legend(override.aes = list(shape = NA))) +
-  labs(
-    x = glue::glue("Constrained comp. 1 ({MVA.synt(oat_rda)[[2]]$tab[1,2] %>% round(2)}%)"),
-    y = glue::glue("Constrained comp. 2 ({MVA.synt(oat_rda)[[2]]$tab[2,2] %>% round(2)}%)")
+  scale_x_continuous(
+    glue::glue("Constrained comp. 1 ({MVA.synt(oat_rda)[[2]]$tab[1,2] %>% round(2)}%)"),
+    limits = symmetric_limits
+  ) +
+  scale_y_continuous(
+    glue::glue("Constrained comp. 2 ({MVA.synt(oat_rda)[[2]]$tab[2,2] %>% round(2)}%)"),
+    limits = symmetric_limits
   ) +
   # Theme
   theme_bw() +
@@ -143,11 +155,17 @@ ggplot(oat_score_df, aes(x = `Constr. comp. 1`, y = `Constr. comp. 2`,
 
 ```{r}
 ggplot(oat_load_df) +
-  geom_segment(aes(x = 0, y = 0, xend = `Constr. comp. 1`, yend = `Constr. comp. 2`),
+  geom_segment(aes(
+    x = 0,
+    y = 0,
+    xend = cor1,
+    yend = cor2,
+    alpha = sig.either
+  ),
                arrow = arrow(length = unit(0.02, "npc"))) +
   geom_label_repel(
-    aes(x = `Constr. comp. 1`,
-        y = `Constr. comp. 2`,
+    aes(x = cor1,
+        y = cor2,
         label = nutrient),
     size = 2.4,
     segment.alpha = 0.6,
@@ -156,15 +174,24 @@ ggplot(oat_load_df) +
     nudge_y = oat_load_df$yplus * .01,
     seed = 678
   ) +
-  labs(
-    x = glue::glue("Constrained comp. 1 ({MVA.synt(oat_rda)[[2]]$tab[1,2] %>% round(2)}%)"),
-    y = glue::glue("Constrained comp. 2 ({MVA.synt(oat_rda)[[2]]$tab[2,2] %>% round(2)}%)")
+  scale_alpha_manual(values = c(0.5, 1)) +
+  scale_x_continuous(
+    glue::glue("Constrained comp. 1 ({MVA.synt(oat_rda)[[2]]$tab[1,2] %>% round(2)}%)"),
+    limits = symmetric_limits
+  ) +
+  scale_y_continuous(
+    glue::glue("Constrained comp. 2 ({MVA.synt(oat_rda)[[2]]$tab[2,2] %>% round(2)}%)"),
+    limits = symmetric_limits
   ) +
   # Theme
   theme_bw() +
-  theme(panel.grid= element_blank())
+  theme(panel.grid= element_blank(), legend.position = "none")
 ```
 
+```{r}
+MVA.corplot(oat_rda)
+View(MVA.corplot)
+```
 
 ## Beans
 

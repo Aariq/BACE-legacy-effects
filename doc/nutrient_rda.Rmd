@@ -18,6 +18,8 @@ library(tidyverse)
 library(targets)
 library(vegan)
 library(RVAideMemoire)
+library(ggpubr)
+library(ggrepel)
 set.seed(9872) #for reproducibility of permutation tests
 ```
 
@@ -53,16 +55,6 @@ A brief description of how RDA works from @herveMultivariateAnalysisMultiple2018
 `jul_herbivory` is cumulative herbivory in July, which was small-mammal herbivory.  `late_herbivory` is the cumulative herbivory in August minus cumulative herbivory in July.  Late herbivory was insect herbivory.  So `jul_herbivory` is small mammal herbivory and `late_herbivory` is just the insect herbivory.
 
 ## Oats
-
-```{r}
-# oat_rda <-
-#   rda(
-#     oat_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
-#     data = oat_nutr,
-#     scale = FALSE #already scaled and centered
-#   )
-```
-
 Formula:
 
 ```{r}
@@ -74,8 +66,9 @@ oat_rda$call
 MVA.synt(oat_rda)
 ```
 
-The experimental design (current treatment, historical treatment, their interaction, and herbivory) explain \~34% of variation in nutrients.
-The first two constrained axes capture \~83% of *that* variance. So, about `r round(.8256*.3388*100, 2)`% of the constrained variance are explained by the first two axes 
+Conditional = % variation explained by `house`
+Constrained = % variation explained by predictor variables
+Unconstrained = remaining variation
 
 ### Permutation Test
 
@@ -95,70 +88,33 @@ The model does explain a significant proportion of variance.  Now we can do a ma
 MVA.anova(oat_rda)
 ```
 
-Current treatment and early (small mammal) herbivory significantly affect nutrients in oats.
+Current treatment significantly affect nutrients in oats.  `late_herbivory` is marginally significant
 
 ### Plots
 
 ```{r}
-MVA.plot(
-  oat_rda,
-  "score",
-  fac = oat_nutr$current,
-  col = c("blue", "darkgreen", "brown"),
-  legend = TRUE,
-  barycenters = FALSE,
-  stars = FALSE,
-  contours = TRUE,
-  legend.title = "Current Treatment",
-  xlim = c(-5, 5)
-)
-MVA.plot(
-  oat_rda,
-  "score",
-  fac = oat_nutr$jul_herbivory,
-  col = c("black", "red"),
-  legend = TRUE,
-  barycenters = FALSE,
-  stars = FALSE,
-  contours = TRUE,
-  legend.title = "July Herbivory",
-  xlim = c(-5, 5)
-)
-MVA.plot(
-  oat_rda,
-  "corr",
-  add = FALSE,
-  # intcircle = NULL,
-  # thresh = 0.5
-)
-```
-
-Axis 1 is positively correlated with Mn, B, and Ca and negatively correlated with P, K, Cu, Zn, Fe.  Axis 2 is positively correlated with N and negatively correlated with Al.
-
-```{r}
-library(ggpubr)
-```
-
-
-```{r}
 #extract scores
-oat_scores <- MVA.scores(oat_rda)
+oat_scores <- MVA.scores(oat_rda, xax = 1, yax = 2)
 #combine with experimental treatments
 oat_score_df <- bind_cols(oat_nutr, oat_scores$coord)
 ```
 
-With convex hulls for herbivory
-
 ```{r}
-ggplot(oat_score_df, aes(x = `Constr. comp. 1`, y = `Constr. comp. 2`,
-                         fill = jul_herbivory,
-                         color = jul_herbivory,
-                         linetype = jul_herbivory)) +
-  stat_chull(geom = "polygon", alpha = 0.4, color = "black") +
-  geom_point(aes(shape = current), color = "black") +
-  theme_bw() +
-  theme(panel.grid= element_blank())
+#extract loadings
+oat_load_df <-
+  MVA.load(oat_rda)$loads %>% 
+  as_tibble(rownames = "nutrient") %>% 
+  #format nutrients for plotting
+  mutate(nutrient = str_extract(nutrient, "(?<=nutr\\.)\\w{1,2}(?=_scaled)")) %>% 
+  mutate(nutrient = str_to_title(nutrient)) %>% 
+  #math to put labels at tips of arrows
+  mutate(m = `Constr. comp. 2`/`Constr. comp. 1`,
+         xplus = sqrt(1 / (1 + m^2)),
+         yplus = abs(m * xplus)) %>% 
+  mutate(xplus = ifelse(sign(`Constr. comp. 1`) == -1, xplus*-1, xplus),
+         yplus = ifelse(sign(`Constr. comp. 2`) == -1, yplus*-1, yplus))
 ```
+
 
 With convex hulls for current treatment
 
@@ -167,16 +123,46 @@ ggplot(oat_score_df, aes(x = `Constr. comp. 1`, y = `Constr. comp. 2`,
                          fill = current,
                          color = current,
                          linetype = current)) +
+  # Plot points and convex hull
   stat_chull(geom = "polygon", alpha = 0.4, color = "black") +
-  geom_point(aes(shape = jul_herbivory), color = "black") +
+  geom_point(aes(shape = historical), color = "black", size = 2, stroke = 0.75) +
+  # Scales and legends
+  scale_fill_viridis_d("Current", begin = 0.33) +
+  scale_linetype_manual("Current", values = c("solid", "longdash", "dotted")) +
+  scale_shape_discrete("Historical", solid = FALSE) +
+  guides(fill = guide_legend(override.aes = list(shape = NA))) +
+  labs(
+    x = glue::glue("Constrained comp. 1 ({MVA.synt(oat_rda)[[2]]$tab[1,2] %>% round(2)}%)"),
+    y = glue::glue("Constrained comp. 2 ({MVA.synt(oat_rda)[[2]]$tab[2,2] %>% round(2)}%)")
+  ) +
+  # Theme
   theme_bw() +
   theme(panel.grid= element_blank())
+  
 ```
 
-What is that big divide?
 ```{r}
-oat_score_df %>% filter(`Constr. comp. 1` < 0) %>% filter(jul_herbivory == "some") %>% count(plot)
-oat_score_df %>% filter(`Constr. comp. 1` > 0) %>% count(plot)
+ggplot(oat_load_df) +
+  geom_segment(aes(x = 0, y = 0, xend = `Constr. comp. 1`, yend = `Constr. comp. 2`),
+               arrow = arrow(length = unit(0.02, "npc"))) +
+  geom_label_repel(
+    aes(x = `Constr. comp. 1`,
+        y = `Constr. comp. 2`,
+        label = nutrient),
+    size = 2.4,
+    segment.alpha = 0.6,
+    segment.size = 0.3,
+    nudge_x = oat_load_df$xplus * .01,
+    nudge_y = oat_load_df$yplus * .01,
+    seed = 678
+  ) +
+  labs(
+    x = glue::glue("Constrained comp. 1 ({MVA.synt(oat_rda)[[2]]$tab[1,2] %>% round(2)}%)"),
+    y = glue::glue("Constrained comp. 2 ({MVA.synt(oat_rda)[[2]]$tab[2,2] %>% round(2)}%)")
+  ) +
+  # Theme
+  theme_bw() +
+  theme(panel.grid= element_blank())
 ```
 
 

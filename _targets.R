@@ -73,6 +73,12 @@ tar_plan(
   oat_rda = fit_rda(oat_nutr),
   bean_rda = fit_rda(bean_nutr),
   kale_rda = fit_rda(kale_nutr),
+  
+  ## Score plots
+  
+  oat_score = plot_rda_scores(oat_rda, oat_nutr),
+  bean_score = plot_rda_scores(bean_rda, bean_nutr),
+  kale_score = plot_rda_scores(kale_rda, kale_nutr),
 
   tar_render(nutrient_rda, "doc/nutrient_rda.Rmd")
 )

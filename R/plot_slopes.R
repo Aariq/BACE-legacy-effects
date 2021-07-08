@@ -21,20 +21,23 @@ plot_slopes_panel <- function(model, exp = TRUE, conf = 0.84) {
   }
   
   ggplot(slope_df) +
-    geom_pointrange(aes(
-      x = hist_treat,
-      shape = curr_treat,
-      color = curr_treat,
-      y = days.trend,
-      ymin = lower.CL,
-      ymax = upper.CL
-    ),
-    position = position_dodge(width = 0.2)) +
+    geom_pointrange(
+      aes(
+        x = hist_treat,
+        shape = curr_treat,
+        color = curr_treat,
+        y = days.trend,
+        ymin = lower.CL,
+        ymax = upper.CL
+      ),
+      position = position_dodge(width = 0.2)
+    ) +
+    scale_color_viridis_d("Current", begin = .25, end = 0.95) +
+    scale_shape_discrete("Current", solid = TRUE) +
     labs(
-      x = "Historical",
-      color = "Current",
-      shape = "Current") + 
-    theme_bw()
+      x = "Historical") + 
+    theme_bw() 
+    
 }
 
 #' Create 3-panel figure of emtrends plots

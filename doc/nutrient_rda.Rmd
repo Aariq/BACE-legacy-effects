@@ -58,24 +58,32 @@ A brief description of how RDA works from @herveMultivariateAnalysisMultiple2018
 > The 'constrained PCA' is applied on the fitted values of the regression and summarizes the variation of the chemical data explained by the controlled variables.
 > The 'unconstrained PCA' is applied on the residuals of the regression and summarizes the variation that is not related to the controlled variables.
 
-**NOTE**
-`jul_herbivory` is cumulative herbivory in July, which was small-mammal herbivory.  `late_herbivory` is the cumulative herbivory in August minus cumulative herbivory in July.  Late herbivory was insect herbivory.  So `jul_herbivory` is small mammal herbivory and `late_herbivory` is just the insect herbivory.
+**NOTE** `jul_herbivory` is cumulative herbivory in July, which was small-mammal herbivory.
+`late_herbivory` is the cumulative herbivory in August minus cumulative herbivory in July.
+Late herbivory was insect herbivory.
+So `jul_herbivory` is small mammal herbivory and `late_herbivory` is just the insect herbivory.
+
+## Methods
+
+To understand how current and historical precipitation treatments affected crop nutrients we used partial redundancy analysis (partial RDA), a supervised multivariate technique (CITATION).
+Variation explained by the blocking effect of house was accounted for ("partialed out") before modeling the effects of historical treatment, current treatment, their interaction, early herbivory (small mammal), and late herbivory (arthropods) on crop nutrients.
+RDA was performed with the `rda` function from the `vegan` package [@oksanenVeganCommunityEcology2020].
+RDA significance was determined with permutation tests performed using the `RVAideMemoire` package [@herveRVAideMemoireTestingPlotting2021].
+Score plots and correlation plots were produced using packages `ggplot2` [@wickhamGgplot2ElegantGraphics2016], `ggrepel` [@slowikowskiGgrepelAutomaticallyPosition2021], and `ggpubr` [@kassambaraGgpubrGgplot2Based2020].
 
 ## Oats
+
 Formula:
 
 ```{r}
 oat_rda$call
 ```
 
-
 ```{r}
 MVA.synt(oat_rda)
 ```
 
-Conditional = % variation explained by `house`
-Constrained = % variation explained by predictor variables
-Unconstrained = remaining variation
+Conditional = % variation explained by `house` Constrained = % variation explained by predictor variables Unconstrained = remaining variation
 
 ### Permutation Test
 
@@ -89,25 +97,27 @@ Test for significance that this amount of explained variance is higher than the 
 anova(oat_rda)
 ```
 
-The model does explain a significant proportion of variance.  Now we can do a marginal hypothesis test (type II ANOVA)
+The model does explain a significant proportion of variance.
+Now we can do a marginal hypothesis test (type II ANOVA)
 
 ```{r}
 MVA.anova(oat_rda)
 ```
 
-Current treatment significantly affect nutrients in oats.  `late_herbivory` is marginally significant
+Current treatment significantly affect nutrients in oats.
+`late_herbivory` is marginally significant
 
 ### Plots
 
 ```{r}
 oat_score
 ```
+
 ```{r}
 oat_cor
 ```
 
 ## Beans
-
 
 Formula:
 
@@ -115,13 +125,11 @@ Formula:
 bean_rda$call
 ```
 
-
 ```{r}
 MVA.synt(bean_rda)
 ```
 
 \~33% of variation explained by "experiment"
-
 
 ### Permutation Test
 
@@ -145,17 +153,13 @@ bean_score
 bean_cor
 ```
 
-
-
 ## Kale
-
 
 Formula:
 
 ```{r}
 kale_rda$call
 ```
-
 
 ```{r}
 MVA.synt(kale_rda)
@@ -188,7 +192,8 @@ kale_cor
 
 # References
 
-<div id="refs"></div>
+::: {#refs}
+:::
 
 # Reproducibility
 

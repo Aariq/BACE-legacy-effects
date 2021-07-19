@@ -37,6 +37,18 @@ withr::with_dir(here::here(), {
 
 # Analysis
 
+To determine the effects of the historical and current precipitation treatments on crop growth, we analyzed the effects of the treatments on change in height over time.
+Because kale grows indeterminately <!--# correct terminology? -->, we used height data from the entire experiment from \_\_\_\_ to \_\_\_\_.
+Oats and beans, on the other hand, switched from growth to reproduction and we only used data from the growing phase to analyze effects on height.
+This was \_\_\_ to \_\_\_ for oats and \_\_\_ to \_\_\_ for beans.
+We used linear mixed effects models to model height as a function of date, historical treatment, current treatment, their three-way interaction, and all two-way interactions among them.
+Additionally, early herbivory incidence (mainly small mammal herbivory) and house ID were included as fixed effects.
+Pot ID and plant ID were included as random effects.
+For kale and beans, height was log transformed to meet model assumptions.
+Height data for oats was left untransformed as the untransformed data better fit model assumptions of linearity and homogeneity of variances.
+Models were fit using the `lme4` package [@batesFittingLinearMixedeffects2015].
+Because we were primarily interested in the fitted slope of height as a function of date, we focused our interpretation on two- and three-way interactions with date using the `emtrends()` function from the `emmeans` package [@lenthEmmeans2021].
+
 ## Kale
 
 Model:

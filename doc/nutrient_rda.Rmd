@@ -154,24 +154,24 @@ ggplot(oat_score_df, aes(x = `Constr. comp. 1`, y = `Constr. comp. 2`,
 ```
 
 ```{r}
-ggplot(oat_load_df) +
+ggplot(oat_cor_df) +
   geom_segment(aes(
     x = 0,
     y = 0,
-    xend = cor1,
-    yend = cor2,
-    alpha = sig.either
+    xend = `Constr. comp. 1`,
+    yend = `Constr. comp. 2`,
+    alpha = thresh
   ),
                arrow = arrow(length = unit(0.02, "npc"))) +
   geom_label_repel(
-    aes(x = cor1,
-        y = cor2,
+    aes(x = `Constr. comp. 1`,
+        y = `Constr. comp. 2`,
         label = nutrient),
     size = 2.4,
     segment.alpha = 0.6,
     segment.size = 0.3,
-    nudge_x = oat_load_df$xplus * .01,
-    nudge_y = oat_load_df$yplus * .01,
+    nudge_x = oat_cor_df$xplus * .01,
+    nudge_y = oat_cor_df$yplus * .01,
     seed = 678
   ) +
   scale_alpha_manual(values = c(0.5, 1)) +
@@ -190,7 +190,7 @@ ggplot(oat_load_df) +
 
 ```{r}
 MVA.corplot(oat_rda)
-View(MVA.corplot)
+# View(MVA.corplot)
 ```
 
 ## Beans

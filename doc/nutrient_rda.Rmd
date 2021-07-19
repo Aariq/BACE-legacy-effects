@@ -32,7 +32,13 @@ withr::with_dir(here::here(), {
     kale_nutr,
     oat_rda,
     bean_rda,
-    kale_rda
+    kale_rda,
+    oat_score,
+    oat_cor,
+    bean_score,
+    bean_cor,
+    kale_score,
+    kale_cor
   ))
 })
 ```
@@ -94,115 +100,14 @@ Current treatment significantly affect nutrients in oats.  `late_herbivory` is m
 ### Plots
 
 ```{r}
-#extract scores
-oat_scores <- MVA.scores(oat_rda, xax = 1, yax = 2)
-#combine with experimental treatments
-oat_score_df <- bind_cols(oat_nutr, oat_scores$coord)
+oat_score
 ```
-
 ```{r}
-#extract correlations
-oat_cor_df <-
-  MVA.cor(oat_rda)$corr %>% 
-  as_tibble(rownames = "nutrient") %>% 
-  #format nutrients for plotting
-  mutate(nutrient = str_extract(nutrient, "(?<=nutr\\.)\\w{1,2}(?=_scaled)")) %>% 
-  mutate(nutrient = str_to_title(nutrient)) %>% 
-  #math to put labels at tips of arrows
-  mutate(m = `Constr. comp. 2`/`Constr. comp. 1`,
-         xplus = sqrt(1 / (1 + m^2)),
-         yplus = abs(m * xplus)) %>% 
-  mutate(xplus = ifelse(sign(`Constr. comp. 1`) == -1, xplus*-1, xplus),
-         yplus = ifelse(sign(`Constr. comp. 2`) == -1, yplus*-1, yplus))
-```
-
-```{r}
-# threshold of correlation
-thresh = 0.5
-oat_cor_df <- oat_cor_df %>% 
-  mutate(thresh = abs(`Constr. comp. 1`) > thresh | abs(`Constr. comp. 2`) > thresh)
-```
-
-
-With convex hulls for current treatment
-
-```{r}
-ggplot(oat_score_df, aes(x = `Constr. comp. 1`, y = `Constr. comp. 2`,
-                         fill = current,
-                         color = current,
-                         linetype = current)) +
-  # Plot points and convex hull
-  stat_chull(geom = "polygon", alpha = 0.4, color = "black") +
-  geom_point(aes(shape = historical), color = "black", size = 2, stroke = 0.75) +
-  # Scales and legends
-  scale_fill_viridis_d("Current", begin = 0.33) +
-  scale_linetype_manual("Current", values = c("solid", "longdash", "dotted")) +
-  scale_shape_discrete("Historical", solid = FALSE) +
-  guides(fill = guide_legend(override.aes = list(shape = NA))) +
-  scale_x_continuous(
-    glue::glue("Constrained comp. 1 ({MVA.synt(oat_rda)[[2]]$tab[1,2] %>% round(2)}%)"),
-    limits = symmetric_limits
-  ) +
-  scale_y_continuous(
-    glue::glue("Constrained comp. 2 ({MVA.synt(oat_rda)[[2]]$tab[2,2] %>% round(2)}%)"),
-    limits = symmetric_limits
-  ) +
-  # Theme
-  theme_bw() +
-  theme(panel.grid= element_blank())
-  
-```
-
-```{r}
-ggplot(oat_cor_df) +
-  geom_segment(aes(
-    x = 0,
-    y = 0,
-    xend = `Constr. comp. 1`,
-    yend = `Constr. comp. 2`,
-    alpha = thresh
-  ),
-               arrow = arrow(length = unit(0.02, "npc"))) +
-  geom_label_repel(
-    aes(x = `Constr. comp. 1`,
-        y = `Constr. comp. 2`,
-        label = nutrient),
-    size = 2.4,
-    segment.alpha = 0.6,
-    segment.size = 0.3,
-    nudge_x = oat_cor_df$xplus * .01,
-    nudge_y = oat_cor_df$yplus * .01,
-    seed = 678
-  ) +
-  scale_alpha_manual(values = c(0.5, 1)) +
-  scale_x_continuous(
-    glue::glue("Constrained comp. 1 ({MVA.synt(oat_rda)[[2]]$tab[1,2] %>% round(2)}%)"),
-    limits = symmetric_limits
-  ) +
-  scale_y_continuous(
-    glue::glue("Constrained comp. 2 ({MVA.synt(oat_rda)[[2]]$tab[2,2] %>% round(2)}%)"),
-    limits = symmetric_limits
-  ) +
-  # Theme
-  theme_bw() +
-  theme(panel.grid= element_blank(), legend.position = "none")
-```
-
-```{r}
-MVA.corplot(oat_rda)
-# View(MVA.corplot)
+oat_cor
 ```
 
 ## Beans
 
-```{r}
-# bean_rda <-
-#   rda(
-#     bean_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
-#     data = bean_nutr,
-#     scale = FALSE
-#   )
-```
 
 Formula:
 
@@ -233,51 +138,17 @@ current treatment and july herbivory significantly affect nutrients.
 ### Plots
 
 ```{r}
-MVA.plot(
-  bean_rda,
-  "score",
-  fac = bean_nutr$current,
-  col = c("blue", "darkgreen", "brown"),
-  legend = TRUE,
-  barycenters = FALSE,
-  stars = FALSE,
-  contours = TRUE,
-  legend.title = "current",
-  xlim = c(-5, 5)
-)
-MVA.plot(
-  bean_rda,
-  "score",
-  fac = bean_nutr$jul_herbivory,
-  col = c("black", "red"),
-  legend = TRUE,
-  barycenters = FALSE,
-  stars = FALSE,
-  contours = TRUE,
-  legend.title = "July Herbivory",
-  xlim = c(-5, 5)
-)
-MVA.plot(
-  bean_rda,
-  "corr",
-  add = FALSE,
-  # intcircle = NULL,
-  # thresh = 0.5
-)
+bean_score
 ```
 
-Axis 1 is positively correlated with mn and negatively correlated with Zn, K, P, and N.  Axis 2 negatively correlated with N.
+```{r}
+bean_cor
+```
+
+
 
 ## Kale
 
-```{r}
-# kale_rda <-
-#   rda(
-#     kale_nutr["nutr"] ~ historical * current + jul_herbivory + late_herbivory,
-#     data = kale_nutr,
-#     scale = TRUE
-#   )
-```
 
 Formula:
 
@@ -308,53 +179,12 @@ Early herbivory is also significant
 ### Plots
 
 ```{r}
-MVA.plot(
-  kale_rda,
-  "score",
-  fac = kale_nutr$historical,
-  col = c("blue", "darkgreen", "brown"),
-  legend = TRUE,
-  barycenters = FALSE,
-  stars = FALSE,
-  contours = TRUE,
-  legend.title = "historical",
-  xlim = c(-5, 5)
-)
-MVA.plot(
-  kale_rda,
-  "score",
-  fac = kale_nutr$current,
-  col = c("blue", "darkgreen", "brown"),
-  legend = TRUE,
-  barycenters = FALSE,
-  stars = FALSE,
-  contours = TRUE,
-  legend.title = "current",
-  xlim = c(-5, 5)
-)
-MVA.plot(
-  kale_rda,
-  "score",
-  fac = kale_nutr$jul_herbivory,
-  col = c("black", "red"),
-  legend = TRUE,
-  barycenters = FALSE,
-  stars = FALSE,
-  contours = TRUE,
-  legend.title = "July Herbivory",
-  xlim = c(-5, 5)
-)
-MVA.plot(
-  kale_rda,
-  "corr",
-  add = FALSE,
-  # intcircle = NULL,
-  # thresh = 0.5
-)
+kale_score
 ```
 
-Axis 1 = more nutrition to less nutrition, separates along historical from high, low, medium Axis 2 = high in zn and n to high in p, cu, mn.
-separates current from 75%, 50%, ambient.
+```{r}
+kale_cor
+```
 
 # References
 

@@ -74,7 +74,7 @@ tar_plan(
   bean_rda = fit_rda(bean_nutr),
   kale_rda = fit_rda(kale_nutr),
   
-  ## Score plots
+  ## Score and correlation plots
   
   oat_score = plot_rda_scores(oat_rda, oat_nutr),
   bean_score = plot_rda_scores(bean_rda, bean_nutr),

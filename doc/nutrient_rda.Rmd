@@ -21,6 +21,8 @@ library(RVAideMemoire)
 library(ggpubr)
 library(ggrepel)
 library(ggpmisc)
+library(car)
+
 set.seed(9872) #for reproducibility of permutation tests
 ```
 
@@ -117,6 +119,34 @@ oat_score
 oat_cor
 ```
 
+### ANOVAs for Fe, N, Zn
+
+Log transformed to better meet assumptions of normality of residuals.
+
+```{r}
+oat_fe <- 
+  lm(log(fe) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = oat_nutr)
+# performance::check_model(oat_fe)
+Anova(oat_fe)
+```
+
+```{r}
+oat_n <-
+  lm(log(n) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = oat_nutr)
+# performance::check_model(oat_n)
+Anova(oat_n)
+```
+
+```{r}
+oat_zn <-
+  lm(log(zn) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = oat_nutr)
+# performance::check_model(oat_zn)
+Anova(oat_zn)
+```
+
 ## Beans
 
 Formula:
@@ -152,6 +182,35 @@ bean_score
 ```{r}
 bean_cor
 ```
+
+### ANOVAs for Fe, N, Zn
+
+Log transformed to better meet assumptions of normality of residuals.
+
+```{r}
+bean_fe <- 
+  lm(log(fe) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = bean_nutr)
+# performance::check_model(bean_fe)
+Anova(bean_fe)
+```
+
+```{r}
+bean_n <-
+  lm(log(n) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = bean_nutr)
+# performance::check_model(bean_n)
+Anova(bean_n)
+```
+
+```{r}
+bean_zn <-
+  lm(log(zn) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = bean_nutr)
+# performance::check_model(bean_zn)
+Anova(bean_zn)
+```
+
 
 ## Kale
 
@@ -190,6 +249,34 @@ kale_score
 
 ```{r}
 kale_cor
+```
+
+### ANOVAs for Fe, N, Zn
+
+Log transformed to better meet assumptions of normality of residuals.
+
+```{r}
+kale_fe <- 
+  lm(log(fe) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = kale_nutr)
+# performance::check_model(kale_fe)
+Anova(kale_fe)
+```
+
+```{r}
+kale_n <-
+  lm(log(n) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = kale_nutr)
+# performance::check_model(kale_n)
+Anova(kale_n)
+```
+
+```{r}
+kale_zn <-
+  lm(log(zn) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = kale_nutr)
+# performance::check_model(kale_zn)
+Anova(kale_zn)
 ```
 
 # Publication Quality Figure

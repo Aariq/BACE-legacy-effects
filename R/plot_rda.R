@@ -14,8 +14,8 @@ plot_rda_scores <- function(rda, data) {
     scale_shape_discrete("Historical", solid = FALSE) +
     guides(fill = guide_legend(override.aes = list(shape = NA))) +
     labs(
-      x = glue::glue("Constrained comp. 1 ({MVA.synt(rda)[[2]]$tab[1,2] %>% round(2)}%)"),
-      y = glue::glue("Constrained comp. 2 ({MVA.synt(rda)[[2]]$tab[2,2] %>% round(2)}%)")
+      x = glue::glue("Constr. comp. 1 ({MVA.synt(rda)[[2]]$tab[1,2] %>% round(2)}%)"),
+      y = glue::glue("Constr. comp. 2 ({MVA.synt(rda)[[2]]$tab[2,2] %>% round(2)}%)")
     ) +
     # Theme
     theme_bw() +
@@ -62,8 +62,8 @@ plot_rda_loadings <- function(rda, data) {
     # grey out non-significant arrows
     scale_alpha_manual(values = c(0.5, 1)) +
     labs(
-      x = glue::glue("Constrained comp. 1 ({MVA.synt(rda)[[2]]$tab[1,2] %>% round(2)}%)"),
-      y = glue::glue("Constrained comp. 2 ({MVA.synt(rda)[[2]]$tab[2,2] %>% round(2)}%)")
+      x = glue::glue("Constr. comp. 1 ({MVA.synt(rda)[[2]]$tab[1,2] %>% round(2)}%)"),
+      y = glue::glue("Constr. comp. 2 ({MVA.synt(rda)[[2]]$tab[2,2] %>% round(2)}%)")
     ) +
     # Theme
     theme_bw() +
@@ -107,11 +107,11 @@ plot_rda_cor <- function(rda, thresh = 0.5) {
     ) +
     scale_alpha_manual(values = c(0.5, 1)) +
     scale_x_continuous(
-      glue::glue("Constrained comp. 1 ({MVA.synt(rda)[[2]]$tab[1,2] %>% round(2)}%)"),
+      glue::glue("Constr. comp. 1 ({MVA.synt(rda)[[2]]$tab[1,2] %>% round(2)}%)"),
       limits = symmetric_limits
     ) +
     scale_y_continuous(
-      glue::glue("Constrained comp. 2 ({MVA.synt(rda)[[2]]$tab[2,2] %>% round(2)}%)"),
+      glue::glue("Constr. comp. 2 ({MVA.synt(rda)[[2]]$tab[2,2] %>% round(2)}%)"),
       limits = symmetric_limits
     ) +
     # Theme

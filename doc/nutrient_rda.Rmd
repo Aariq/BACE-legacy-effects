@@ -182,12 +182,29 @@ Early herbivory is also significant
 
 ### Plots
 
+But the treatments aren't fully separated by the first two axes, but the mean plant, if you will, in 50% current treatment has more nutrients than ambient and 75%
+
 ```{r}
 kale_score
 ```
 
 ```{r}
 kale_cor
+```
+
+# Publication Quality Figure
+
+```{r fig.height=9, fig.width=8}
+library(patchwork)
+rda_mult <- 
+  kale_cor + kale_score +
+  bean_cor + bean_score +
+  oat_cor  + oat_score  +
+  plot_layout(ncol = 2, guides = "collect") & 
+  plot_annotation(tag_level = "a")
+ 
+ ggsave(here::here("doc", "figs", "RDA.png"), rda_mult, height = 9, width = 8)
+ ggsave(here::here("doc", "figs", "RDA.pdf"), rda_mult, height = 9, width = 8)
 ```
 
 # References

@@ -83,5 +83,5 @@ tar_plan(
   bean_cor = plot_rda_cor(bean_rda),
   kale_cor = plot_rda_cor(kale_rda),
 
-  tar_render(nutrient_rda, "doc/nutrient_rda.Rmd")
+  tar_render(nutrient_rda, "doc/nutrients.Rmd")
 )

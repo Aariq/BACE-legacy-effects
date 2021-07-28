@@ -21,7 +21,6 @@ tar_plan(
   growth_fig = make_growth_fig(longdata),
   tar_target(growth_fig_png, ggsave(here("doc", "figs", "growth.png"), growth_fig), format = "file"),
   tar_target(growth_fig_pdf, ggsave(here("doc", "figs", "growth.pdf"), growth_fig), format = "file"),
-  tar_render(eda, "doc/growth_exploratory.Rmd"),
   
   # establish cutoffs for exponential growth period
   oat_cutoff = ymd("2018-08-07"),
@@ -43,8 +42,7 @@ tar_plan(
   tar_target(slopes_fig_png, ggsave(here("doc", "figs", "slopes.png"), slopes_plot), format = "file"),
   tar_target(slopes_fig_pdf, ggsave(here("doc", "figs", "slopes.pdf"), slopes_plot), format = "file"),
   #Longitudinal Results
-  tar_render(long_results, "doc/long_results.Rmd"),
-  
+
   #Nutrient data
   tar_target(nutr_file, here("data", "three_period_data_5_13_2021.xlsx"), format = "file"),
 
@@ -87,12 +85,6 @@ tar_plan(
   
   rda_plot = make_rda_plot(kale_score, bean_score, oat_score, kale_cor, bean_cor, oat_cor),
 
-  tar_render(nutrient_rda, "doc/nutrients.Rmd"),
-  
-  # Final harvest
-  
-  tar_render(final_harvest, "doc/final_harvest.Rmd"),
-  
   # One report to rule them all
   tar_render(report, "doc/report.Rmd")
   

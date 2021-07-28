@@ -49,3 +49,4 @@ renv/
 *.nb.html
 *.pdf
 !doc/report.html
+!index.html

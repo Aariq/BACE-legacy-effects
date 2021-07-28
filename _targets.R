@@ -85,9 +85,7 @@ tar_plan(
   bean_cor = plot_rda_cor(bean_rda),
   oat_cor = plot_rda_cor(oat_rda),
   
-  
-  
-  rda_plot = make_rda_plot(oat_score, bean_score, kale_score, oat_cor, bean_cor, kale_cor),
+  rda_plot = make_rda_plot(kale_score, bean_score, oat_score, kale_cor, bean_cor, oat_cor),
 
   tar_render(nutrient_rda, "doc/nutrients.Rmd"),
   

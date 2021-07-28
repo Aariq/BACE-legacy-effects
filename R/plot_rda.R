@@ -118,3 +118,11 @@ plot_rda_cor <- function(rda, thresh = 0.5) {
     theme_bw() +
     theme(panel.grid= element_blank(), legend.position = "none")
 }
+
+make_rda_plot <- function(kale_score, bean_score, oat_score, kale_cor, bean_cor, oat_cor) {
+  kale_cor + kale_score +
+    bean_cor + bean_score +
+    oat_cor  + oat_score  +
+    plot_layout(ncol = 2, guides = "collect") & 
+    plot_annotation(tag_level = "a")
+}

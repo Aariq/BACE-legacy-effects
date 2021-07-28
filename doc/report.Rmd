@@ -1,0 +1,426 @@
+---
+title: "BACE legacy effects analysis"
+author: "Eric R. Scott"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  bookdown::html_document2: 
+    toc: yes
+    toc_float: yes
+    highlight: kate
+    theme: yeti
+bibliography: references.bib
+csl: elsevier-harvard.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, paged.print = FALSE)
+library(tidyverse)
+library(patchwork)
+library(car)
+library(lme4)
+library(RVAideMemoire)
+library(vegan)
+library(targets)
+set.seed(2785) #for consistency with permuation tests
+```
+
+```{r load-targets, include=FALSE}
+withr::with_dir(here::here(), {
+  tar_load(c(
+    growth_fig,
+    k_ht,
+    b_ht,
+    o_ht,
+    slopes_plot
+  ))
+})
+```
+
+# Longitudinal Growth
+
+## Methods
+
+To determine the effects of the historical and current precipitation treatments on crop growth, we analyzed the effects of the treatments on change in height over time.
+Because kale grows indeterminately <!--# correct terminology? -->, we used height data from the entire experiment from Jul 2 to Oct 9 (Figure \@ref(fig:growth)a).
+Oats and beans, on the other hand, switched from growth to reproduction and we only used data from the growing phase to analyze effects on height (Figure \@ref(fig:growth)b,c).
+This was Jul 2 to Aug 7 for oats and Jul 2 to Jul 31 for beans.
+We used linear mixed effects models to model height as a function of date, historical treatment, current treatment, their three-way interaction, and all two-way interactions among them.
+Additionally, early herbivory incidence (mainly small mammal herbivory) and house ID were included as fixed effects.
+Pot ID and plant ID were included as random effects.
+For kale and beans, height was log transformed to meet model assumptions.
+Height data for oats was left untransformed as the untransformed data better fit model assumptions of linearity and homogeneity of variances.
+Models were fit using the `lme4` package [@batesFittingLinearMixedeffects2015].
+Because we were primarily interested in the fitted slope of height as a function of date, we focused our interpretation on two- and three-way interactions with date using the `emtrends()` function from the `emmeans` package [@lenthEmmeans2021].
+
+```{r}
+cap <- "Weekly change in height of kale (a), beans (b), and oats (c)."
+```
+
+```{r growth, fig.cap=cap}
+growth_fig
+```
+
+## Results
+
+### Kale
+
+```{r}
+Anova(k_ht)
+```
+
+The change in height over time is statistically significant (p \< 0.001).
+There is a significant three-way interaction between day, historical treatment, and current treatment.
+This means that the slope of height over days depends on the interaction between historical and current treatment (I think; 3-way interactions are difficult to interpret) (Figure \@ref(fig:slopes)a).
+
+```{r}
+cap <- "Fitted growth rates from (generalized) linear mixed effects models of crop height as a function of day, herbivory, historical and current treatments,  their interaction, and the three-way interaction between day, historical, and current treatments.  For kale (a) and beans (b), the y-axis is fitted values from a log-link gaussian GLMM modeling exponential growth.  For oats (c), the y-axis is fitted values from an identity-link model and represent linear growth rates."
+```
+
+```{r slopes, fig.cap = cap, fig.height=6, fig.width=4}
+slopes_plot
+```
+
+### Beans
+
+```{r}
+Anova(b_ht)
+```
+
+-   days = significant growth (change in height over time)
+-   days:hist_treat = different slopes (height over time) for different historical treatments (Figure \@ref(fig:slopes)b).
+
+### Oats
+
+```{r}
+Anova(o_ht)
+```
+
+-   days = significant growth (change in height over time)
+-   house = significant blocking effect (weeds?)
+-   curr_treat = different intercepts for different treatments
+-   days:curr_treat = different slopes (height over time) for different current treatments
+-   days:hist_treat:curr_treat = hard to interpret, especially since no main effects
+-   Figure \@ref(fig:slopes)c
+
+```{r}
+#cleanup
+rm(growth_fig,
+  k_ht,
+  b_ht,
+  o_ht,
+  slopes_plot)
+```
+
+# Nutrient Analysis
+
+```{r}
+withr::with_dir(here::here(), {
+  tar_load(c(
+    oat_rda,
+    bean_rda,
+    kale_rda,
+    rda_plot,
+    kale_nutr,
+    bean_nutr,
+    oat_nutr
+  ))
+})
+```
+
+## Methods
+
+To understand how current and historical precipitation treatments affected crop nutrients we used partial redundancy analysis (partial RDA), a supervised multivariate technique [@brocardOrdinationReducedSpace2006].
+We modeled the effects of historical treatment, current treatment, their interaction, early herbivory (small mammal), and late herbivory (arthropods) on crop nutrients while controlling for the effect of house (i.e. house was used as a conditional variable and "partialed out").
+Partial RDA was performed on centered and scaled nutrient data using the `rda` function from the `vegan` package [@oksanenVeganCommunityEcology2020].
+RDA significance was determined with permutation tests performed using the `RVAideMemoire` package [@herveRVAideMemoireTestingPlotting2021].
+Score plots and correlation plots were produced using packages `ggplot2` [@wickhamGgplot2ElegantGraphics2016], `ggrepel` [@slowikowskiGgrepelAutomaticallyPosition2021], and `ggpubr` [@kassambaraGgpubrGgplot2Based2020].
+When the RDA was significant, we followed up with univariate ANOVAs for log-transformed concentrations of Fe, Zn, and N.
+
+**NOTE**: From the help file for `rda()` in case it is helpful for revising the methods:
+
+> Partial CCA (pCCA; or alternatively partial RDA) can be used to remove the effect of some conditioning or background or random variables or covariables before CCA proper.
+> In fact, pCCA compares models cca(X \~ Z) and cca(X \~ Y + Z) and attributes their difference to the effect of Y cleansed of the effect of Z.
+
+[in this case X is nutrients, Y is our predictors (current treatment, historical treatment, etc.) and Z is "house"]
+
+**NOTE** `jul_herbivory` is cumulative herbivory in July, which was small-mammal herbivory.
+`late_herbivory` is the cumulative herbivory in August minus cumulative herbivory in July.
+Late herbivory was insect herbivory.
+So `jul_herbivory` is small mammal herbivory and `late_herbivory` is just the insect herbivory.
+
+## Results
+
+### Kale
+
+```{r}
+MVA.synt(kale_rda)
+```
+
+-   14.58% of variation in nutrients explained by "house"
+-   28.66% of variation in nutrients explained by historical \* current + jul_herbivory + late_herbivory
+-   Of the "constrained" variance, 67.49% is explained with the fist two axes.
+
+```{r}
+anova(kale_rda)
+```
+
+An omnibus permutation test shows that the overall RDA is significant ($F = 2.07$, $p < 0.001$).
+
+```{r}
+MVA.anova(kale_rda)
+```
+
+Historical treatment, current treatment, and early herbivory all significantly affected nutrients.
+
+```{r}
+cap <- "Redundancy analysis (RDA) correlation plots (a, c, e) and score plots (b,d,f) for kale (a,b), beans (c,d), and oats (e,f).  In the correlation plots, greyed out arrows respresent nutrients that have a correlation < 0.5 to either axis"
+```
+
+```{r rda, fig.cap=cap, fig.height=8, fig.width=6.5}
+rda_plot
+```
+
+The first constrained component (the one that explains most of the variation due to predictors) explains about 54% of the variation explained by the predictors (less if you'd rather report the total variation in nutrients explained) (Figure \@ref(fig:rda)a,b).
+This axis is negatively correlated with Fe, Cu, K, Al, etc (Figure \@ref(fig:rda)a).
+Separation by historical and current treatment is minimal in the score plot (Figure \@ref(fig:rda)b).
+Might be separation due to herbivory (not plotted)?
+
+**Followup ANOVAs**
+
+Fe:
+
+```{r}
+kale_fe <- 
+  lm(log(fe) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = kale_nutr)
+# performance::check_model(kale_fe)
+Anova(kale_fe)
+```
+
+N:
+
+```{r}
+kale_n <-
+  lm(log(n) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = kale_nutr)
+# performance::check_model(kale_n)
+Anova(kale_n)
+```
+
+Zn:
+
+```{r}
+kale_zn <-
+  lm(log(zn) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = kale_nutr)
+# performance::check_model(kale_zn)
+Anova(kale_zn)
+```
+
+### Beans
+
+```{r}
+MVA.synt(bean_rda)
+```
+
+Omnibus test:
+
+```{r}
+anova(bean_rda)
+```
+
+marginal effects test:
+
+```{r}
+MVA.anova(bean_rda)
+```
+
+-   Only current treatment significant.
+-   Figure \@ref(fig:rda)c,d
+
+**Followup ANOVAs**
+
+Fe:
+
+```{r}
+bean_fe <- 
+  lm(log(fe) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = bean_nutr)
+# performance::check_model(bean_fe)
+Anova(bean_fe)
+```
+
+N:
+
+```{r}
+bean_n <-
+  lm(log(n) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = bean_nutr)
+# performance::check_model(bean_n)
+Anova(bean_n)
+```
+
+Zn:
+
+```{r}
+bean_zn <-
+  lm(log(zn) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = bean_nutr)
+# performance::check_model(bean_zn)
+Anova(bean_zn)
+```
+
+### Oats
+
+```{r}
+MVA.synt(oat_rda)
+```
+
+omnibus test:
+
+```{r}
+anova(oat_rda)
+```
+
+marginal effects test:
+
+```{r}
+MVA.anova(oat_rda)
+```
+
+-   Only current treatment is significant
+-   Figure \@ref(fig:rda)e,f
+
+**Followup ANOVAs**
+
+Fe:
+
+```{r}
+oat_fe <- 
+  lm(log(fe) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = oat_nutr)
+# performance::check_model(oat_fe)
+Anova(oat_fe)
+```
+
+N:
+
+```{r}
+oat_n <-
+  lm(log(n) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = oat_nutr)
+# performance::check_model(oat_n)
+Anova(oat_n)
+```
+
+Zn:
+
+```{r}
+oat_zn <-
+  lm(log(zn) ~ historical * current + jul_herbivory + late_herbivory + house,
+       data = oat_nutr)
+# performance::check_model(oat_zn)
+Anova(oat_zn)
+```
+
+```{r}
+#cleanup
+rm(oat_rda,
+   bean_rda,
+   kale_rda,
+   rda_plot)
+```
+
+# Biomass Analysis
+
+```{r}
+withr::with_dir(here::here(), {
+  tar_load(c(kale_nutr))
+})
+```
+
+## Methods
+
+To evaluate the effects of current and historical treatment on final biomass and root:shoot ratio, we used linear models (AKA ANOVAs) including historical treatment, current treatment, their interaction, early herbivory, late herbivory, and house as predictors.
+
+If I remember correctly, this analysis only makes sense for kale.
+
+## Results
+
+```{r}
+kale <- 
+  kale_nutr %>%
+  select(
+    current,
+    historical,
+    plot_id,
+    pot_id,
+    house,
+    aug_ht,
+    mass_above,
+    mass_below,
+    mass_total,
+    jul_herbivory_mean,
+    jul_herbivory,
+    late_herbivory_mean,
+    late_herbivory
+  ) %>% 
+  mutate(rs_ratio = mass_below / mass_above)
+```
+
+Total biomass:
+
+```{r}
+mass_lm <- lm(mass_total ~ current * historical + jul_herbivory + late_herbivory + house,
+   data = kale)
+# check_model(mass_lm)
+Anova(mass_lm)
+```
+
+No significant effect on biomass
+
+Root:shoot ratio:
+
+```{r}
+rs_lm <- lm(rs_ratio ~ current * historical + jul_herbivory + late_herbivory + house,
+   data = kale)
+# check_model(rs_lm)
+Anova(rs_lm)
+```
+
+No significant effect on root:shoot ratio
+
+# References
+
+::: {#refs}
+:::
+
+# Reproducibility
+
+<details>
+
+<summary>
+
+Reproducibility receipt
+
+</summary>
+
+```{r}
+## datetime
+Sys.time()
+
+## repository
+if(requireNamespace('git2r', quietly = TRUE)) {
+  git2r::repository()
+} else {
+  c(
+    system2("git", args = c("log", "--name-status", "-1"), stdout = TRUE),
+    system2("git", args = c("remote", "-v"), stdout = TRUE)
+  )
+}
+
+## session info
+sessionInfo()
+```
+
+</details>

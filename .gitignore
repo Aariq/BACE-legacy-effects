@@ -48,3 +48,4 @@ renv/
 *.docx
 *.nb.html
 *.pdf
+!doc/report.html

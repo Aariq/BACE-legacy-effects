@@ -86,6 +86,6 @@ tar_plan(
   rda_plot = make_rda_plot(kale_score, bean_score, oat_score, kale_cor, bean_cor, oat_cor),
 
   # One report to rule them all
-  tar_render(report, "doc/report.Rmd")
+  tar_render(report, "doc/index.Rmd")
   
 )

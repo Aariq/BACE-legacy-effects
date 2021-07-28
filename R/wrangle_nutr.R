@@ -34,7 +34,8 @@ clean_kale_nutr <- function(kale_nutr_raw) {
            mass_above = abvmass,
            mass_below = pot_mean_aug_blw,
            mass_total = total_potmean_aug) %>% 
-    select(-num_range("x", 23:28), -id, -august_herbivory)
+    select(-num_range("x", 23:28), -id, -august_herbivory) %>% 
+    mutate(across(starts_with("mass_"), as.numeric))
 }
 
 

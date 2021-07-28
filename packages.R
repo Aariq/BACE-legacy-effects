@@ -23,6 +23,8 @@ library(ggpubr)
 library(ggrepel)
 library(glue)
 library(ggpmisc)
+library(car)
+library(performance)
 
 conflict_prefer("lag", "dplyr")
 conflict_prefer("filter", "dplyr")

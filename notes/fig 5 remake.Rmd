@@ -26,7 +26,7 @@ all_nutr <-
   list("kale" = kale_nutr, "bean" = bean_nutr, "oat" = oat_nutr) %>%
   map(
     ~ .x %>%
-        select(current, historical, plot, plot_id, pot_number, pot_id, N = n, Fe = fe, Zn = zn, Ca = ca, K = k)
+        select(current, historical, plot, plot_id, pot_number, pot_id, N = n, Fe = fe, Zn = zn, Ca = ca, K = k, Mg = mg)
     ) %>%
   bind_rows(.id = "species")
 ```
@@ -34,7 +34,7 @@ all_nutr <-
 ```{r}
 all_nutr_long <- 
   all_nutr %>% 
-  pivot_longer(N:K,
+  pivot_longer(N:Mg,
                names_to = "nutrient",
                values_to = "conc")
 ```
@@ -77,19 +77,10 @@ p_oat <-
   labs(x = "Historical", y = "Concentration (units??)")
 ```
 
-Would be nice to put legend in empty space.  Snagged this from a [stackoverflow post](https://stackoverflow.com/questions/54438495/shift-legend-into-empty-facets-of-a-faceted-plot-in-ggplot2)
 
 ```{r}
-source(here("R", "shift_legend.R"))
-```
-
-```{r}
-p_kale <- shift_legend(p_kale)
-p_bean <- shift_legend(p_bean)
-p_oat  <- shift_legend(p_oat)
 p_kale
 p_bean
 p_oat
 ```
 
-I like this.  Tidy up colors and factor names and such

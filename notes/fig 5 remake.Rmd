@@ -1,0 +1,95 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r setup}
+knitr::opts_chunk$set(paged.print = TRUE)
+library(targets)
+library(tidyverse)
+library(here)
+```
+
+
+```{r}
+withr::with_dir(here::here(), {
+  targets::tar_load(c(
+    kale_nutr,
+    bean_nutr,
+    oat_nutr
+  ))
+})
+```
+
+```{r}
+all_nutr <- 
+  list("kale" = kale_nutr, "bean" = bean_nutr, "oat" = oat_nutr) %>%
+  map(
+    ~ .x %>%
+        select(current, historical, plot, plot_id, pot_number, pot_id, N = n, Fe = fe, Zn = zn, Ca = ca, K = k)
+    ) %>%
+  bind_rows(.id = "species")
+```
+
+```{r}
+all_nutr_long <- 
+  all_nutr %>% 
+  pivot_longer(N:K,
+               names_to = "nutrient",
+               values_to = "conc")
+```
+
+```{r}
+ggplot(all_nutr_long, aes(x = current, y = conc, fill = historical)) +
+  geom_boxplot() +
+  facet_grid(cols = vars(species), rows = vars(nutrient), scales = "free_y")
+```
+
+Hmm... might want entirely free scales, meaning separate plots for kale beans and oats.
+
+```{r}
+p_kale <-
+  ggplot(all_nutr_long %>% filter(species == "kale"),
+       aes(x = historical, y = conc, fill = current)) + 
+  geom_boxplot(outlier.size = 0.8, size = 0.3) +
+  scale_y_continuous(breaks = scales::breaks_pretty()) +
+  scale_fill_viridis_d("Current", begin = .25, end = 0.95) +
+  facet_wrap(~nutrient, scales = "free_y") +
+  theme_bw() +
+  labs(x = "Historical", y = "Concentration (units??)")
+p_bean <-
+  ggplot(all_nutr_long %>% filter(species == "bean"),
+       aes(x = historical, y = conc, fill = current)) + 
+  geom_boxplot(outlier.size = 0.8, size = 0.3) +
+  scale_y_continuous(breaks = scales::breaks_pretty()) +
+  scale_fill_viridis_d("Current", begin = .25, end = 0.95) +
+  facet_wrap(~nutrient, scales = "free_y") +
+  theme_bw() +
+  labs(x = "Historical", y = "Concentration (units??)")
+p_oat <-
+  ggplot(all_nutr_long %>% filter(species == "oat"),
+       aes(x = historical, y = conc, fill = current)) + 
+  geom_boxplot(outlier.size = 0.8, size = 0.3) +
+  scale_y_continuous(breaks = scales::breaks_pretty()) +
+  scale_fill_viridis_d("Current", begin = .25, end = 0.95) +
+  facet_wrap(~nutrient, scales = "free_y") +
+  theme_bw() +
+  labs(x = "Historical", y = "Concentration (units??)")
+```
+
+Would be nice to put legend in empty space.  Snagged this from a [stackoverflow post](https://stackoverflow.com/questions/54438495/shift-legend-into-empty-facets-of-a-faceted-plot-in-ggplot2)
+
+```{r}
+source(here("R", "shift_legend.R"))
+```
+
+```{r}
+p_kale <- shift_legend(p_kale)
+p_bean <- shift_legend(p_bean)
+p_oat  <- shift_legend(p_oat)
+p_kale
+p_bean
+p_oat
+```
+
+I like this.  Tidy up colors and factor names and such

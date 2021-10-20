@@ -28,7 +28,9 @@ all_nutr <-
     ~ .x %>%
         select(current, historical, plot, plot_id, pot_number, pot_id, N = n, Fe = fe, Zn = zn, Ca = ca, K = k, Mg = mg)
     ) %>%
-  bind_rows(.id = "species")
+  bind_rows(.id = "species") %>% 
+  #convert ppm to percent (Fe and Zn are measured in ppm, the others in %)
+  mutate(across(c(Fe, Zn), ~.x/1000))
 ```
 
 ```{r}
@@ -56,7 +58,7 @@ p_kale <-
   scale_fill_viridis_d("Current", begin = .25, end = 0.95) +
   facet_wrap(~nutrient, scales = "free_y") +
   theme_bw() +
-  labs(x = "Historical", y = "Concentration (units??)")
+  labs(x = "Historical", y = "% Dry Weight")
 p_bean <-
   ggplot(all_nutr_long %>% filter(species == "bean"),
        aes(x = historical, y = conc, fill = current)) + 
@@ -65,7 +67,7 @@ p_bean <-
   scale_fill_viridis_d("Current", begin = .25, end = 0.95) +
   facet_wrap(~nutrient, scales = "free_y") +
   theme_bw() +
-  labs(x = "Historical", y = "Concentration (units??)")
+  labs(x = "Historical", y = "% Dry Weight")
 p_oat <-
   ggplot(all_nutr_long %>% filter(species == "oat"),
        aes(x = historical, y = conc, fill = current)) + 
@@ -74,7 +76,7 @@ p_oat <-
   scale_fill_viridis_d("Current", begin = .25, end = 0.95) +
   facet_wrap(~nutrient, scales = "free_y") +
   theme_bw() +
-  labs(x = "Historical", y = "Concentration (units??)")
+  labs(x = "Historical", y = "% Dry Weight")
 ```
 
 

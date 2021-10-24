@@ -32,7 +32,7 @@ tar_plan(
   o_ht = fit_ht(longdata %>% filter(species == "oats") %>% filter(date <= oat_cutoff), log_trans = FALSE),
   
   #model validation
-  tar_render(model_validation, "docs/model_validation.Rmd"),
+  tar_render(model_validation, "doc/model_validation.Rmd"),
   
   # plot slopes ------------
   k_slopes = plot_slopes_panel(k_ht),

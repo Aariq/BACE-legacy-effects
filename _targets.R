@@ -32,7 +32,7 @@ tar_plan(
   o_ht = fit_ht(longdata %>% filter(species == "oats") %>% filter(date <= oat_cutoff), log_trans = FALSE),
   
   #model validation
-  # tar_render(model_validation, "doc/model_validation.Rmd"),
+  tar_render(model_validation, "docs/model_validation.Rmd"),
   
   # plot slopes ------------
   k_slopes = plot_slopes_panel(k_ht),
@@ -87,10 +87,10 @@ tar_plan(
   rda_plot = make_rda_plot(kale_score, bean_score, oat_score, kale_cor, bean_cor, oat_cor),
   
   # Nutrient boxplots --------
-  kale_boxplot = plot_nutr_b oxplot(kale_nutr),
+  kale_boxplot = plot_nutr_boxplot(kale_nutr),
   bean_boxplot = plot_nutr_boxplot(bean_nutr),
   oat_boxplot = plot_nutr_boxplot(oat_nutr),
   # One report to rule them all
-  # tar_render(report, "doc/index.Rmd")
+  tar_render(report, "doc/index.Rmd")
   
 )

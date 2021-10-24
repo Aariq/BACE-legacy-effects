@@ -155,7 +155,7 @@ So `jul_herbivory` is small mammal herbivory and `late_herbivory` is just the in
 
 Boxplot
 
-```{r fig.height=8, fig.width=6.5}
+```{r fig.height=4, fig.width=6.5}
 tar_read(kale_boxplot)
 ```
 
@@ -230,7 +230,7 @@ Anova(kale_zn)
 
 Boxplot
 
-```{r fig.height=8, fig.width=6.5}
+```{r fig.height=4, fig.width=6.5}
 tar_read(bean_boxplot)
 ```
 
@@ -290,8 +290,8 @@ Anova(bean_zn)
 
 Boxplot
 
-```{r fig.height=8, fig.width=6.5}
-tar_read(oat_boxplot)
+```{r fig.height=4, fig.width=6.5}
+withr::with_dir(here::here(),tar_read(oat_boxplot))
 ```
 
 ```{r}

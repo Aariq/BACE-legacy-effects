@@ -127,6 +127,7 @@ withr::with_dir(here::here(), {
 })
 ```
 
+
 ## Methods
 
 To understand how current and historical precipitation treatments affected crop nutrients we used partial redundancy analysis (partial RDA), a supervised multivariate technique [@brocardOrdinationReducedSpace2006].
@@ -151,6 +152,13 @@ So `jul_herbivory` is small mammal herbivory and `late_herbivory` is just the in
 ## Results
 
 ### Kale
+
+Boxplot
+
+```{r fig.height=8, fig.width=6.5}
+tar_read(kale_boxplot)
+```
+
 
 ```{r}
 MVA.synt(kale_rda)
@@ -217,7 +225,15 @@ kale_zn <-
 Anova(kale_zn)
 ```
 
+
 ### Beans
+
+Boxplot
+
+```{r fig.height=8, fig.width=6.5}
+tar_read(bean_boxplot)
+```
+
 
 ```{r}
 MVA.synt(bean_rda)
@@ -271,6 +287,12 @@ Anova(bean_zn)
 ```
 
 ### Oats
+
+Boxplot
+
+```{r fig.height=8, fig.width=6.5}
+tar_read(oat_boxplot)
+```
 
 ```{r}
 MVA.synt(oat_rda)

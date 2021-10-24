@@ -19,8 +19,8 @@ tar_plan(
   # Descriptive plots ------------
   longfig = make_longfig(longdata),
   growth_fig = make_growth_fig(longdata),
-  tar_target(growth_fig_png, ggsave(here("doc", "figs", "growth.png"), growth_fig), format = "file"),
-  tar_target(growth_fig_pdf, ggsave(here("doc", "figs", "growth.pdf"), growth_fig), format = "file"),
+  tar_target(growth_fig_png, ggsave(here("docs", "figs", "growth.png"), growth_fig), format = "file"),
+  tar_target(growth_fig_pdf, ggsave(here("docs", "figs", "growth.pdf"), growth_fig), format = "file"),
   
   # establish cutoffs for exponential growth period
   oat_cutoff = ymd("2018-08-07"),
@@ -32,15 +32,15 @@ tar_plan(
   o_ht = fit_ht(longdata %>% filter(species == "oats") %>% filter(date <= oat_cutoff), log_trans = FALSE),
   
   #model validation
-  tar_render(model_validation, "doc/model_validation.Rmd"),
+  tar_render(model_validation, "docs/model_validation.Rmd"),
   
   # plot slopes ------------
   k_slopes = plot_slopes_panel(k_ht),
   b_slopes = plot_slopes_panel(b_ht),
   o_slopes = plot_slopes_panel(o_ht, exp = FALSE),
   slopes_plot = plot_slopes(k_slopes, b_slopes, o_slopes),
-  tar_target(slopes_fig_png, ggsave(here("doc", "figs", "slopes.png"), slopes_plot), format = "file"),
-  tar_target(slopes_fig_pdf, ggsave(here("doc", "figs", "slopes.pdf"), slopes_plot), format = "file"),
+  tar_target(slopes_fig_png, ggsave(here("docs", "figs", "slopes.png"), slopes_plot), format = "file"),
+  tar_target(slopes_fig_pdf, ggsave(here("docs", "figs", "slopes.pdf"), slopes_plot), format = "file"),
   
   #Longitudinal Results --------
 
@@ -91,6 +91,6 @@ tar_plan(
   bean_boxplot = plot_nutr_boxplot(bean_nutr),
   oat_boxplot = plot_nutr_boxplot(oat_nutr),
   # One report to rule them all
-  tar_render(report, "doc/index.Rmd")
+  tar_render(report, "docs/index.Rmd")
   
 )

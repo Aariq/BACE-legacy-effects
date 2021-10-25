@@ -87,10 +87,45 @@ tar_plan(
   rda_plot = make_rda_plot(kale_score, bean_score, oat_score, kale_cor, bean_cor, oat_cor),
   
   # Nutrient boxplots --------
+  
   kale_boxplot = plot_nutr_boxplot(kale_nutr),
   bean_boxplot = plot_nutr_boxplot(bean_nutr),
   oat_boxplot = plot_nutr_boxplot(oat_nutr),
-  # One report to rule them all
+  
+  tar_target(kale_boxplot_png,
+             ggsave(here("docs", "figs", "kale_boxplot.png"), 
+                    kale_boxplot,
+                    width = 6.5, height = 4),
+             format = "file"),
+  tar_target(kale_boxplot_pdf,
+             ggsave(here("docs", "figs", "kale_boxplot.pdf"), 
+                    kale_boxplot,
+                    width = 6.5, height = 4),
+             format = "file"),
+  
+  tar_target(bean_boxplot_png,
+             ggsave(here("docs", "figs", "bean_boxplot.png"), 
+                    bean_boxplot,
+                    width = 6.5, height = 4),
+             format = "file"),
+  tar_target(bean_boxplot_pdf,
+             ggsave(here("docs", "figs", "bean_boxplot.pdf"), 
+                    bean_boxplot,
+                    width = 6.5, height = 4),
+             format = "file"),
+  
+  tar_target(oat_boxplot_png,
+             ggsave(here("docs", "figs", "oat_boxplot.png"), 
+                    oat_boxplot,
+                    width = 6.5, height = 4),
+             format = "file"),
+  tar_target(oat_boxplot_pdf,
+             ggsave(here("docs", "figs", "oat_boxplot.pdf"), 
+                    oat_boxplot,
+                    width = 6.5, height = 4),
+             format = "file"),
+  
+  # Report for coauthors ------
   tar_render(report, "docs/index.Rmd")
   
 )

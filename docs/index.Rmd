@@ -21,17 +21,22 @@ library(lme4)
 library(RVAideMemoire)
 library(vegan)
 library(targets)
-set.seed(2785) #for consistency with permuation tests
+library(broom)
+library(lmtest)
+library(targets)
+set.seed(2785) #for consistency with permutation tests
 ```
 
 ```{r load-targets, include=FALSE}
 withr::with_dir(here::here(), {
   tar_load(c(
     growth_fig,
-    k_ht,
-    b_ht,
-    o_ht,
-    slopes_plot
+    targets::ends_with("ht"),
+    targets::ends_with("rda"),
+    targets::ends_with("nutr"),
+    rda_plot,
+    slopes_plot,
+    targets::ends_with("boxplot")
   ))
 })
 ```
@@ -102,40 +107,20 @@ Anova(o_ht)
 -   days:hist_treat:curr_treat = hard to interpret, especially since no main effects
 -   Figure \@ref(fig:slopes)c
 
-```{r}
-#cleanup
-rm(growth_fig,
-  k_ht,
-  b_ht,
-  o_ht,
-  slopes_plot)
-```
 
 # Nutrient Analysis
 
-```{r}
-withr::with_dir(here::here(), {
-  tar_load(c(
-    oat_rda,
-    bean_rda,
-    kale_rda,
-    rda_plot,
-    kale_nutr,
-    bean_nutr,
-    oat_nutr
-  ))
-})
-```
-
-
 ## Methods
+
+**One pot (Kale pot 1 historical 50 current 50, Maine ID 106) was removed from the nutrient data due to a 0 being reported for Mg concentration rather than a limit of detection or limit of quantification.**
 
 To understand how current and historical precipitation treatments affected crop nutrients we used partial redundancy analysis (partial RDA), a supervised multivariate technique [@brocardOrdinationReducedSpace2006].
 We modeled the effects of historical treatment, current treatment, their interaction, early herbivory (small mammal), and late herbivory (arthropods) on crop nutrients while controlling for the effect of house (i.e. house was used as a conditional variable and "partialed out").
 Partial RDA was performed on centered and scaled nutrient data using the `rda` function from the `vegan` package [@oksanenVeganCommunityEcology2020].
 RDA significance was determined with permutation tests performed using the `RVAideMemoire` package [@herveRVAideMemoireTestingPlotting2021].
 Score plots and correlation plots were produced using packages `ggplot2` [@wickhamGgplot2ElegantGraphics2016], `ggrepel` [@slowikowskiGgrepelAutomaticallyPosition2021], and `ggpubr` [@kassambaraGgpubrGgplot2Based2020].
-When the RDA was significant, we followed up with univariate ANOVAs for log-transformed concentrations of Fe, Zn, and N.
+
+When the RDA was significant, we followed up with univariate ANOVAs for log-transformed concentrations of Fe, Zn, N, **Ca, Mg, and K. Only factors found significant in the RDA were included in the post-hoc ANOVA models and only statistically significant ANOVA models (false discovery rate adjusted Wald test p-values < 0.05) were analyzed.**
 
 **NOTE**: From the help file for `rda()` in case it is helpful for revising the methods:
 
@@ -153,26 +138,20 @@ So `jul_herbivory` is small mammal herbivory and `late_herbivory` is just the in
 
 ### Kale
 
-Boxplot
-
-```{r fig.height=4, fig.width=6.5}
-tar_read(kale_boxplot)
-```
-
 
 ```{r}
 MVA.synt(kale_rda)
 ```
 
--   14.58% of variation in nutrients explained by "house"
--   28.66% of variation in nutrients explained by historical \* current + jul_herbivory + late_herbivory
--   Of the "constrained" variance, 67.49% is explained with the fist two axes.
+-   **14.99%** of variation in nutrients explained by "house"
+-   **29.38%** of variation in nutrients explained by historical \* current + jul_herbivory + late_herbivory
+-   Of the "constrained" variance, **57.29%** is explained with the fist two axes.
 
 ```{r}
 anova(kale_rda)
 ```
 
-An omnibus permutation test shows that the overall RDA is significant ($F = 2.07$, $p < 0.001$).
+An omnibus permutation test shows that the overall RDA is significant (**$F = 2.11$**, $p < 0.001$).
 
 ```{r}
 MVA.anova(kale_rda)
@@ -188,51 +167,52 @@ cap <- "Redundancy analysis (RDA) correlation plots (a, c, e) and score plots (b
 rda_plot
 ```
 
-The first constrained component (the one that explains most of the variation due to predictors) explains about 54% of the variation explained by the predictors (less if you'd rather report the total variation in nutrients explained) (Figure \@ref(fig:rda)a,b).
+The first constrained component (the one that explains most of the variation due to predictors) explains about **57%** of the variation explained by the predictors (less if you'd rather report the total variation in nutrients explained) (Figure \@ref(fig:rda)a,b).
 This axis is negatively correlated with Fe, Cu, K, Al, etc (Figure \@ref(fig:rda)a).
 Separation by historical and current treatment is minimal in the score plot (Figure \@ref(fig:rda)b).
 Might be separation due to herbivory (not plotted)?
 
-**Followup ANOVAs**
-
-Fe:
-
-```{r}
-kale_fe <- 
-  lm(log(fe) ~ historical * current + jul_herbivory + late_herbivory + house,
-       data = kale_nutr)
-# performance::check_model(kale_fe)
-Anova(kale_fe)
-```
-
-N:
-
-```{r}
-kale_n <-
-  lm(log(n) ~ historical * current + jul_herbivory + late_herbivory + house,
-       data = kale_nutr)
-# performance::check_model(kale_n)
-Anova(kale_n)
-```
-
-Zn:
-
-```{r}
-kale_zn <-
-  lm(log(zn) ~ historical * current + jul_herbivory + late_herbivory + house,
-       data = kale_nutr)
-# performance::check_model(kale_zn)
-Anova(kale_zn)
-```
-
-
-### Beans
+#### Followup ANOVAs
 
 Boxplot
 
 ```{r fig.height=4, fig.width=6.5}
-tar_read(bean_boxplot)
+kale_boxplot
 ```
+
+```{r}
+# fit all the linear models
+kale_lms <-
+  map(
+    c("fe", "n", "zn", "mg", "ca", "k"),
+    ~glue::glue("log({.x}) ~ historical + current + jul_herbivory + house") %>%
+      as.formula()
+  ) %>%
+  map(~lm(.x, data = tar_read(kale_nutr))) %>%
+  set_names(c("Fe", "N", "Zn", "Mg", "Ca", "K"))
+```
+
+Wald tests for overall significance of post-hoc ANOVAs, with false discovery rate adjusted p-values
+
+```{r}
+kale_wald <-
+  kale_lms %>%
+  map_df(~tidy(waldtest(.x)), .id = "nutrient") %>%
+  mutate(p.adj = p.adjust(p.value, method = "fdr"))
+kale_wald
+```
+
+The model for K is not significantly better than an intercept-only model, so I won't look at the ANOVA for it. I'm not going to adjust p-values *within* each ANOVA, but just keep in mind it's a lot of p-values, so Type I error might be high.
+
+```{r}
+kale_anovas <-
+  kale_lms %>%
+  map(~Anova(.x), .id = "nutrient")
+kale_anovas[names(kale_anovas) != "K"]
+```
+
+### Beans
+
 
 
 ```{r}
@@ -254,45 +234,50 @@ MVA.anova(bean_rda)
 -   Only current treatment significant.
 -   Figure \@ref(fig:rda)c,d
 
-**Followup ANOVAs**
-
-Fe:
-
-```{r}
-bean_fe <- 
-  lm(log(fe) ~ historical * current + jul_herbivory + late_herbivory + house,
-       data = bean_nutr)
-# performance::check_model(bean_fe)
-Anova(bean_fe)
-```
-
-N:
-
-```{r}
-bean_n <-
-  lm(log(n) ~ historical * current + jul_herbivory + late_herbivory + house,
-       data = bean_nutr)
-# performance::check_model(bean_n)
-Anova(bean_n)
-```
-
-Zn:
-
-```{r}
-bean_zn <-
-  lm(log(zn) ~ historical * current + jul_herbivory + late_herbivory + house,
-       data = bean_nutr)
-# performance::check_model(bean_zn)
-Anova(bean_zn)
-```
-
-### Oats
+#### Followup ANOVAs
 
 Boxplot
 
 ```{r fig.height=4, fig.width=6.5}
-withr::with_dir(here::here(),tar_read(oat_boxplot))
+bean_boxplot
 ```
+
+
+Only including "current" and "house"
+
+```{r}
+# fit all the linear models
+bean_lms <- 
+  map(
+    c("fe", "n", "zn", "mg", "ca", "k"),
+    ~glue::glue("log({.x}) ~ current + house") %>% 
+      as.formula()
+  ) %>% 
+  map(~lm(.x, data = tar_read(bean_nutr))) %>% 
+  set_names(c("Fe", "N", "Zn", "Mg", "Ca", "K"))
+```
+
+Wald tests for overall significance of post-hoc ANOVAs, with false discovery rate adjusted p-values
+
+```{r}
+bean_wald <-
+  bean_lms %>%
+  map_df(~tidy(lmtest::waldtest(.x)), .id = "nutrient") %>% 
+  mutate(p.adj = p.adjust(p.value, method = "fdr"))
+bean_wald
+```
+Calcium not significant
+
+```{r}
+bean_anovas <- 
+  bean_lms %>% 
+  map(~Anova(.x), .id = "nutrient")
+bean_anovas[names(bean_anovas) != "Ca"]
+```
+
+### Oats
+
+
 
 ```{r}
 MVA.synt(oat_rda)
@@ -313,53 +298,49 @@ MVA.anova(oat_rda)
 -   Only current treatment is significant
 -   Figure \@ref(fig:rda)e,f
 
-**Followup ANOVAs**
+#### Followup ANOVAs
 
-Fe:
+Boxplot
 
-```{r}
-oat_fe <- 
-  lm(log(fe) ~ historical * current + jul_herbivory + late_herbivory + house,
-       data = oat_nutr)
-# performance::check_model(oat_fe)
-Anova(oat_fe)
+```{r fig.height=4, fig.width=6.5}
+oat_boxplot
 ```
 
-N:
+Only including "current" and "house"
 
 ```{r}
-oat_n <-
-  lm(log(n) ~ historical * current + jul_herbivory + late_herbivory + house,
-       data = oat_nutr)
-# performance::check_model(oat_n)
-Anova(oat_n)
+# fit all the linear models
+oat_lms <- 
+  map(
+    c("fe", "n", "zn", "mg", "ca", "k"),
+    ~glue::glue("log({.x}) ~ current + house") %>% 
+      as.formula()
+  ) %>% 
+  map(~lm(.x, data = tar_read(oat_nutr))) %>% 
+  set_names(c("Fe", "N", "Zn", "Mg", "Ca", "K"))
 ```
 
-Zn:
-
-```{r}
-oat_zn <-
-  lm(log(zn) ~ historical * current + jul_herbivory + late_herbivory + house,
-       data = oat_nutr)
-# performance::check_model(oat_zn)
-Anova(oat_zn)
-```
+Wald tests for overall significance of post-hoc ANOVAs, with false discovery rate adjusted p-values
 
 ```{r}
-#cleanup
-rm(oat_rda,
-   bean_rda,
-   kale_rda,
-   rda_plot)
+oat_wald <-
+  oat_lms %>%
+  map_df(~tidy(lmtest::waldtest(.x)), .id = "nutrient") %>% 
+  mutate(p.adj = p.adjust(p.value, method = "fdr"))
+oat_wald
 ```
+
+All are significant
+
+```{r}
+oat_anovas <- 
+  oat_lms %>% 
+  map(~Anova(.x), .id = "nutrient")
+oat_anovas
+```
+
 
 # Biomass Analysis
-
-```{r}
-withr::with_dir(here::here(), {
-  tar_load(c(kale_nutr))
-})
-```
 
 ## Methods
 

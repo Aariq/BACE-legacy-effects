@@ -94,6 +94,8 @@ clean_nutr <- function(nutr, herbivory_data, species){
     ) %>% 
     mutate(across(n:zn, ~str_remove(.x, "<"))) %>%  #just include numbers < LOQ
     mutate(across(n:aug_ht, ~as.numeric(.x))) %>%
+    # Remove 0s. 0s don't make sense, since should be reported as < LOQ
+    filter(across(n:zn, ~.x>0)) %>% 
     #add binary column for pot-level herbivory mean.
     #1 = at least one plant had at least 1 herbivory event
     mutate(

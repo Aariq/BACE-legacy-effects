@@ -1,5 +1,14 @@
-clean_oat_nutr <- function(oat_nutr_raw) {
-  oat_nutr_raw %>% 
+read_wrangle_oat <- function(nutr_file) {
+  #read in data from excel
+  oat_nutr_raw  <- read_excel(nutr_file, sheet = "Oats(pot)")
+  oat_plant_raw <- read_excel(nutr_file, "Oats (plant)")
+  
+  #calculate herbivory
+  oat_herb <- calc_herbivory(oat_plant_raw, "oats")
+  
+  #clean up oat data
+  oat_nutr_clean <- 
+    oat_nutr_raw %>% 
     clean_names() %>% 
     slice(-1) %>%  #remove row with units
     rename(aug_ht = pot_mean_august_height,
@@ -8,12 +17,23 @@ clean_oat_nutr <- function(oat_nutr_raw) {
     select(-id, -august_herbivory) %>% 
     #fix typo
     mutate(historical = if_else(historical == 35, 25, historical))
+  
+  #combine and more cleaning
+  clean_nutr(oat_nutr_clean, oat_herb, "oats")
+  
 }
 
-
-
-clean_bean_nutr <- function(bean_nutr_raw) {
-  bean_nutr_raw %>% 
+read_wrangle_bean <- function(nutr_file) {
+  #read in data from excel
+  bean_nutr_raw  <- read_excel(nutr_file, sheet = "Beans (pot)")
+  bean_plant_raw <- read_excel(nutr_file, sheet = "Beans (plant)")
+  
+  #calculate herbivory
+  bean_herb <- calc_herbivory(bean_plant_raw, "beans")
+  
+  #clean up bean data
+  bean_nutr_clean <- 
+    bean_nutr_raw %>% 
     clean_names() %>% 
     slice(-1) %>%  #remove row with units
     rename(current = current_moisture,
@@ -21,11 +41,23 @@ clean_bean_nutr <- function(bean_nutr_raw) {
            aug_ht = august_height,
            harvest_mass = beanmass) %>% 
     select(-id, -august_herbivory)
+  
+  #combine and more cleaning
+  clean_nutr(bean_nutr_clean, bean_herb, "beans")
+  
 }
 
-
-clean_kale_nutr <- function(kale_nutr_raw) {
-  kale_nutr_raw %>% 
+read_wrangle_kale <- function(nutr_file) {
+  #read in from excel
+  kale_nutr_raw  <- read_excel(nutr_file, sheet = "Kale (Latepot)")
+  kale_plant_raw <- read_excel(nutr_file, sheet = "Kale (plant)")
+  
+  #calculate herbivory
+  kale_herb <- calc_herbivory(kale_plant_raw, "kale")
+  
+  #clean up kale data
+  kale_nutr_clean <- 
+    kale_nutr_raw %>% 
     clean_names() %>%
     slice(-1) %>%  #remove row with units
     rename(current = current_moisture,
@@ -36,6 +68,9 @@ clean_kale_nutr <- function(kale_nutr_raw) {
            mass_total = total_potmean_aug) %>% 
     select(-num_range("x", 23:28), -id, -august_herbivory) %>% 
     mutate(across(starts_with("mass_"), as.numeric))
+  
+  #combine and more cleaning
+  clean_nutr(kale_nutr_clean, kale_herb, "kale")
 }
 
 

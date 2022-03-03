@@ -57,41 +57,29 @@ tar_plan(
              format = "file"),
 
   ### Kale-------
-  kale_nutr_raw = read_excel(nutr_file, sheet = "Kale (Latepot)"),
-  kale_plant_raw = read_excel(nutr_file, sheet = "Kale (plant)"),
-  kale_herb = calc_herbivory(kale_plant_raw, "kale"),
-  kale_nutr_clean = clean_kale_nutr(kale_nutr_raw),
-  kale_nutr = clean_nutr(kale_nutr_clean, kale_herb, "kale"),
+  kale_nutr = read_wrangle_kale(nutr_file),
   
   ### Beans-------
-  bean_nutr_raw = read_excel(nutr_file, sheet = "Beans (pot)"),
-  bean_plant_raw = read_excel(nutr_file, sheet = "Beans (plant)"),
-  bean_herb = calc_herbivory(bean_plant_raw, "beans"),
-  bean_nutr_clean = clean_bean_nutr(bean_nutr_raw),
-  bean_nutr = clean_nutr(bean_nutr_clean, bean_herb, "beans"),
+  bean_nutr = read_wrangle_bean(nutr_file),
   
   ### Oats-------
-  oat_nutr_raw = read_excel(nutr_file, sheet = "Oats(pot)"),
-  oat_plant_raw = read_excel(nutr_file, "Oats (plant)"),
-  oat_herb = calc_herbivory(oat_plant_raw, "oats"),
-  oat_nutr_clean = clean_oat_nutr(oat_nutr_raw),
-  oat_nutr = clean_nutr(oat_nutr_clean, oat_herb, "oats"),
+  oat_nutr = read_wrangle_oat(nutr_file),
   
   #RDAs-------
   
   kale_rda = fit_rda(kale_nutr),
   bean_rda = fit_rda(bean_nutr),
-  oat_rda = fit_rda(oat_nutr),
+  oat_rda  = fit_rda(oat_nutr),
   
   ## Score and correlation plots-------
   
   kale_score = plot_rda_scores(kale_rda, kale_nutr),
   bean_score = plot_rda_scores(bean_rda, bean_nutr),
-  oat_score = plot_rda_scores(oat_rda, oat_nutr),
+  oat_score  = plot_rda_scores(oat_rda, oat_nutr),
   
   kale_cor = plot_rda_cor(kale_rda),
   bean_cor = plot_rda_cor(bean_rda),
-  oat_cor = plot_rda_cor(oat_rda),
+  oat_cor  = plot_rda_cor(oat_rda),
   
   rda_plot = make_rda_plot(kale_score, bean_score, oat_score, kale_cor, bean_cor, oat_cor),
   
@@ -99,7 +87,7 @@ tar_plan(
   
   kale_boxplot = plot_nutr_boxplot(kale_nutr),
   bean_boxplot = plot_nutr_boxplot(bean_nutr),
-  oat_boxplot = plot_nutr_boxplot(oat_nutr),
+  oat_boxplot  = plot_nutr_boxplot(oat_nutr),
   
   tar_target(kale_boxplot_png,
              ggsave(here("docs", "figs", "kale_boxplot.png"), 

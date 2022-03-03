@@ -1,4 +1,7 @@
-wrangle_longdata <- function(longdata_raw) {
+read_wrangle_longdata <- function(longdata_file) {
+  
+  longdata_raw <- read_excel(longdata_file, na = c(".", "*"))
+  
   longdata_raw %>% 
     slice(-1) %>% 
     select(-"...10") %>% 
@@ -52,14 +55,10 @@ wrangle_longdata <- function(longdata_raw) {
       plot %in% 1:3 ~ "1",
       plot %in% 4:6 ~ "2",
       plot %in% 7:9 ~ "3"
-    ))
-}
-
-calc_growth <- function(longdata) {
-  out <- longdata %>%
+    )) %>%
+    #calculate growth
     group_by(species, plant_id) %>%
     arrange(date) %>% 
     mutate(growth = height - lag(height)) %>% 
     ungroup()
-  return(out)
 }

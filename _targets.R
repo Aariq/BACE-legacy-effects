@@ -12,15 +12,17 @@ tar_option_set()
 tar_plan(
   # longitudinal data
   tar_target(longdata_file, here("data","longdata.xlsx"), format = "file"),
-  longdata_raw = read_excel(longdata_file, na = c(".", "*")),
-  longdata_clean = wrangle_longdata(longdata_raw),
-  longdata = calc_growth(longdata_clean),
-  
+  longdata = read_wrangle_longdata(longdata_file),
+
   # Descriptive plots ------------
   longfig = make_longfig(longdata),
   growth_fig = make_growth_fig(longdata),
-  tar_target(growth_fig_png, ggsave(here("docs", "figs", "growth.png"), growth_fig), format = "file"),
-  tar_target(growth_fig_pdf, ggsave(here("docs", "figs", "growth.pdf"), growth_fig), format = "file"),
+  tar_target(growth_fig_png,
+             ggsave(here("docs", "figs", "growth.png"), growth_fig),
+             format = "file"),
+  tar_target(growth_fig_pdf,
+             ggsave(here("docs", "figs", "growth.pdf"), growth_fig), 
+             format = "file"),
   
   # establish cutoffs for exponential growth period
   oat_cutoff = ymd("2018-08-07"),
@@ -29,7 +31,8 @@ tar_plan(
   # fit models for height change ----------
   k_ht = fit_ht(longdata %>% filter(species == "kale")),
   b_ht = fit_ht(longdata %>% filter(species == "beans") %>% filter(date <= bean_cutoff)),
-  o_ht = fit_ht(longdata %>% filter(species == "oats") %>% filter(date <= oat_cutoff), log_trans = FALSE),
+  o_ht = fit_ht(longdata %>% filter(species == "oats") %>% filter(date <= oat_cutoff),
+                log_trans = FALSE),
   
   #model validation
   tar_render(model_validation, "docs/model_validation.Rmd"),
@@ -39,13 +42,19 @@ tar_plan(
   b_slopes = plot_slopes_panel(b_ht),
   o_slopes = plot_slopes_panel(o_ht, exp = FALSE),
   slopes_plot = plot_slopes(k_slopes, b_slopes, o_slopes),
-  tar_target(slopes_fig_png, ggsave(here("docs", "figs", "slopes.png"), slopes_plot), format = "file"),
-  tar_target(slopes_fig_pdf, ggsave(here("docs", "figs", "slopes.pdf"), slopes_plot), format = "file"),
+  tar_target(slopes_fig_png,
+             ggsave(here("docs", "figs", "slopes.png"), slopes_plot),
+             format = "file"),
+  tar_target(slopes_fig_pdf, 
+             ggsave(here("docs", "figs", "slopes.pdf"), slopes_plot),
+             format = "file"),
   
   #Longitudinal Results --------
 
   #Nutrient data
-  tar_target(nutr_file, here("data", "three_period_data_5_13_2021.xlsx"), format = "file"),
+  tar_target(nutr_file, 
+             here("data", "three_period_data_5_13_2021.xlsx"),
+             format = "file"),
 
   ### Kale-------
   kale_nutr_raw = read_excel(nutr_file, sheet = "Kale (Latepot)"),

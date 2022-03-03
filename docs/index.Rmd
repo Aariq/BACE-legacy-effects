@@ -143,15 +143,15 @@ So `jul_herbivory` is small mammal herbivory and `late_herbivory` is just the in
 MVA.synt(kale_rda)
 ```
 
--   **14.99%** of variation in nutrients explained by "house"
--   **29.38%** of variation in nutrients explained by historical \* current + jul_herbivory + late_herbivory
--   Of the "constrained" variance, **57.29%** is explained with the fist two axes.
+-   **13.76%** of variation in nutrients explained by "house"
+-   **30.3%** of variation in nutrients explained by historical \* current + jul_herbivory + late_herbivory
+-   Of the "constrained" variance, **73.49%** is explained with the fist two axes.
 
 ```{r}
 anova(kale_rda)
 ```
 
-An omnibus permutation test shows that the overall RDA is significant (**$F = 2.11$**, $p < 0.001$).
+An omnibus permutation test shows that the overall RDA is significant (**$F = 2.16$**, $p = 0.002$).
 
 ```{r}
 MVA.anova(kale_rda)
@@ -159,18 +159,21 @@ MVA.anova(kale_rda)
 
 Historical treatment, current treatment, and early herbivory all significantly affected nutrients.
 
-```{r}
-cap <- "Redundancy analysis (RDA) correlation plots (a, c, e) and score plots (b,d,f) for kale (a,b), beans (c,d), and oats (e,f).  In the correlation plots, greyed out arrows respresent nutrients that have a correlation < 0.5 to either axis"
-```
 
-```{r rda, fig.cap=cap, fig.height=8, fig.width=6.5}
+```{r}
+#|  rda, fig.height=8, fig.width=6.5,
+#|  fig.cap="Redundancy analysis (RDA) correlation plots (a, c, e) and score
+#|    plots (b,d,f) for kale (a,b), beans (c,d), and oats (e,f).  In the correlation
+#|    plots, greyed out arrows respresent nutrients that have a correlation < 0.5 to
+#|    either axis."
 rda_plot
 ```
 
-The first constrained component (the one that explains most of the variation due to predictors) explains about **57%** of the variation explained by the predictors (less if you'd rather report the total variation in nutrients explained) (Figure \@ref(fig:rda)a,b).
+The first constrained component (the one that explains most of the variation due to predictors) explains about **61%** of the variation explained by the predictors (less if you'd rather report the total variation in nutrients explained) (Figure \@ref(fig:rda)a,b).
 This axis is negatively correlated with Fe, Cu, K, Al, etc (Figure \@ref(fig:rda)a).
 Separation by historical and current treatment is minimal in the score plot (Figure \@ref(fig:rda)b).
 Might be separation due to herbivory (not plotted)?
+**note that none of the variables are over the 0.5 correlation threshold (i.e. all the arrows in \@ref(fig:rda)a are grey)**
 
 #### Followup ANOVAs
 
@@ -198,7 +201,9 @@ Wald tests for overall significance of post-hoc ANOVAs, with false discovery rat
 kale_wald <-
   kale_lms %>%
   map_df(~tidy(waldtest(.x)), .id = "nutrient") %>%
-  mutate(p.adj = p.adjust(p.value, method = "fdr"))
+  mutate(p.adj = p.adjust(p.value, method = "fdr")) %>% 
+  filter(!is.na(df)) %>% 
+  select(-res.df)
 kale_wald
 ```
 
@@ -212,7 +217,6 @@ kale_anovas[names(kale_anovas) != "K"]
 ```
 
 ### Beans
-
 
 
 ```{r}
@@ -263,9 +267,12 @@ Wald tests for overall significance of post-hoc ANOVAs, with false discovery rat
 bean_wald <-
   bean_lms %>%
   map_df(~tidy(lmtest::waldtest(.x)), .id = "nutrient") %>% 
-  mutate(p.adj = p.adjust(p.value, method = "fdr"))
+  mutate(p.adj = p.adjust(p.value, method = "fdr")) %>% 
+  filter(!is.na(df)) %>% 
+  select(-res.df)
 bean_wald
 ```
+
 Calcium not significant
 
 ```{r}
@@ -278,7 +285,6 @@ bean_anovas[names(bean_anovas) != "Ca"]
 ### Oats
 
 
-
 ```{r}
 MVA.synt(oat_rda)
 ```
@@ -288,6 +294,8 @@ omnibus test:
 ```{r}
 anova(oat_rda)
 ```
+
+**Not significant, go no further?**
 
 marginal effects test:
 
@@ -326,7 +334,9 @@ Wald tests for overall significance of post-hoc ANOVAs, with false discovery rat
 oat_wald <-
   oat_lms %>%
   map_df(~tidy(lmtest::waldtest(.x)), .id = "nutrient") %>% 
-  mutate(p.adj = p.adjust(p.value, method = "fdr"))
+  mutate(p.adj = p.adjust(p.value, method = "fdr")) %>% 
+  filter(!is.na(df)) %>% 
+  select(-res.df)
 oat_wald
 ```
 

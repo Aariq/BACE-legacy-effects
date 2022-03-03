@@ -26,11 +26,11 @@ all_nutr <-
   list("kale" = kale_nutr, "bean" = bean_nutr, "oat" = oat_nutr) %>%
   map(
     ~ .x %>%
-        select(current, historical, plot, plot_id, pot_number, pot_id, N = n, Fe = fe, Zn = zn, Ca = ca, K = k, Mg = mg)
+        select(current, historical, plot, plot_id, pot_number, pot_id, N = n, Fe = fe, Ca = ca, K = k, Mg = mg)
     ) %>%
   bind_rows(.id = "species") %>% 
-  #convert ppm to percent (Fe and Zn are measured in ppm, the others in %)
-  mutate(across(c(Fe, Zn), ~.x/1000))
+  #convert ppm to percent (Fe is measured in ppm, the others in %)
+  mutate(Fe = Fe/1000)
 ```
 
 ```{r}

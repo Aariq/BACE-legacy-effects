@@ -120,7 +120,7 @@ Partial RDA was performed on centered and scaled nutrient data using the `rda` f
 RDA significance was determined with permutation tests performed using the `RVAideMemoire` package [@herveRVAideMemoireTestingPlotting2021].
 Score plots and correlation plots were produced using packages `ggplot2` [@wickhamGgplot2ElegantGraphics2016], `ggrepel` [@slowikowskiGgrepelAutomaticallyPosition2021], and `ggpubr` [@kassambaraGgpubrGgplot2Based2020].
 
-When the RDA was significant, we followed up with univariate ANOVAs for log-transformed concentrations of Fe, Zn, N, **Ca, Mg, and K. Only factors found significant in the RDA were included in the post-hoc ANOVA models and only statistically significant ANOVA models (false discovery rate adjusted Wald test p-values < 0.05) were analyzed.**
+When the RDA was significant, we followed up with univariate ANOVAs for log-transformed concentrations of Fe, N, Ca, Mg, and K. **Only factors found significant in the RDA were included in the post-hoc ANOVA models and only statistically significant ANOVA models (false discovery rate adjusted Wald test p-values < 0.05) were analyzed.**
 
 **NOTE**: From the help file for `rda()` in case it is helpful for revising the methods:
 
@@ -184,12 +184,12 @@ kale_boxplot
 # fit all the linear models
 kale_lms <-
   map(
-    c("fe", "n", "zn", "mg", "ca", "k"),
+    c("fe", "n", "mg", "ca", "k"),
     ~glue::glue("log({.x}) ~ historical + current + jul_herbivory + house") %>%
       as.formula()
   ) %>%
   map(~lm(.x, data = tar_read(kale_nutr))) %>%
-  set_names(c("Fe", "N", "Zn", "Mg", "Ca", "K"))
+  set_names(c("Fe", "N", "Mg", "Ca", "K"))
 ```
 
 Wald tests for overall significance of post-hoc ANOVAs, with false discovery rate adjusted p-values
@@ -249,12 +249,12 @@ Only including "current" and "house"
 # fit all the linear models
 bean_lms <- 
   map(
-    c("fe", "n", "zn", "mg", "ca", "k"),
+    c("fe", "n", "mg", "ca", "k"),
     ~glue::glue("log({.x}) ~ current + house") %>% 
       as.formula()
   ) %>% 
   map(~lm(.x, data = tar_read(bean_nutr))) %>% 
-  set_names(c("Fe", "N", "Zn", "Mg", "Ca", "K"))
+  set_names(c("Fe", "N", "Mg", "Ca", "K"))
 ```
 
 Wald tests for overall significance of post-hoc ANOVAs, with false discovery rate adjusted p-values
@@ -312,12 +312,12 @@ Only including "current" and "house"
 # fit all the linear models
 oat_lms <- 
   map(
-    c("fe", "n", "zn", "mg", "ca", "k"),
+    c("fe", "n", "mg", "ca", "k"),
     ~glue::glue("log({.x}) ~ current + house") %>% 
       as.formula()
   ) %>% 
   map(~lm(.x, data = tar_read(oat_nutr))) %>% 
-  set_names(c("Fe", "N", "Zn", "Mg", "Ca", "K"))
+  set_names(c("Fe", "N", "Mg", "Ca", "K"))
 ```
 
 Wald tests for overall significance of post-hoc ANOVAs, with false discovery rate adjusted p-values

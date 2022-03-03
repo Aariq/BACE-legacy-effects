@@ -1,9 +1,9 @@
 plot_nutr_boxplot <- function(data) {
   df <- 
     data %>% 
-    select(current, historical, N = n, Fe = fe, Zn = zn, Ca = ca, K = k, Mg = mg) %>% 
+    select(current, historical, N = n, Fe = fe, Ca = ca, K = k, Mg = mg) %>% 
     #convert from ppm to %
-    mutate(across(c(Fe, Zn), ~.x/1000)) %>% 
+    mutate(Fe = Fe/1000) %>% 
     pivot_longer(N:Mg,
                  names_to = "nutrient",
                  values_to = "conc")

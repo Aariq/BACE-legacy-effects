@@ -123,14 +123,14 @@ clean_nutr <- function(nutr, herbivory_data, species){
       plot,
       pot_number,
       maine_id,
-      n:zn,
+      n:mn,
       aug_ht,
       everything()
     ) %>% 
-    mutate(across(n:zn, ~str_remove(.x, "<"))) %>%  #just include numbers < LOQ
+    mutate(across(n:mn, ~str_remove(.x, "<"))) %>%  #just include numbers < LOQ
     mutate(across(n:aug_ht, ~as.numeric(.x))) %>%
     # Remove 0s. 0s don't make sense, since should be reported as < LOQ
-    filter(across(n:zn, ~.x>0)) %>% 
+    filter(across(n:mn, ~.x>0)) %>% 
     #add binary column for pot-level herbivory mean.
     #1 = at least one plant had at least 1 herbivory event
     mutate(
@@ -164,7 +164,7 @@ clean_nutr <- function(nutr, herbivory_data, species){
       plot %in% 7:9 ~ "3"
     )) %>% 
     # prep for nutrient analysis by scaling and creating a matrix column
-    mutate(across(c(n, ca, k, mg, p, al, b, cu, fe, mn, zn),
+    mutate(across(c(n, ca, k, mg, p, al, b, cu, fe, mn),
                   ~scale(.x),
                   .names = "{.col}_scaled")) %>%
     mutate(nutr = as.matrix(select(., ends_with("_scaled"))))

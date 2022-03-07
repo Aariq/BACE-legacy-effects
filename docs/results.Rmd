@@ -10,6 +10,11 @@ output:
     theme: yeti
 bibliography: references.bib
 csl: elsevier-harvard.csl
+knit: (function(input_file, encoding) {
+  out_dir <- '../docs';
+  rmarkdown::render(input_file,
+ encoding=encoding,
+ output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
 ---
 
 ```{r setup, include=FALSE}
@@ -24,7 +29,7 @@ library(targets)
 library(broom)
 library(lmtest)
 library(targets)
-set.seed(2785) #for consistency with permutation tests
+set.seed(2784) #for consistency with permutation tests
 ```
 
 ```{r load-targets, include=FALSE}
@@ -148,13 +153,13 @@ MVA.synt(kale_rda)
 -   Of the "constrained" variance, **73.49%** is explained with the fist two axes.
 
 ```{r}
-anova(kale_rda)
+anova(kale_rda, permutations = 1000)
 ```
 
 An omnibus permutation test shows that the overall RDA is significant (**$F = 2.16$**, $p = 0.002$).
 
 ```{r}
-MVA.anova(kale_rda)
+MVA.anova(kale_rda, permutations = 1000)
 ```
 
 Historical treatment, current treatment, and early herbivory all significantly affected nutrients.
@@ -226,13 +231,13 @@ MVA.synt(bean_rda)
 Omnibus test:
 
 ```{r}
-anova(bean_rda)
+anova(bean_rda, permutations = 1000)
 ```
 
 marginal effects test:
 
 ```{r}
-MVA.anova(bean_rda)
+MVA.anova(bean_rda, permutations = 1000)
 ```
 
 -   Only current treatment significant.
@@ -292,7 +297,7 @@ MVA.synt(oat_rda)
 omnibus test:
 
 ```{r}
-anova(oat_rda)
+anova(oat_rda, permutations = 1000)
 ```
 
 **Not significant, go no further?**
@@ -300,7 +305,7 @@ anova(oat_rda)
 marginal effects test:
 
 ```{r}
-MVA.anova(oat_rda)
+MVA.anova(oat_rda, permutations = 1000)
 ```
 
 -   Only current treatment is significant

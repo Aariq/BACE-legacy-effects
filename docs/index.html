@@ -1540,7 +1540,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">BACE legacy effects analysis</h1>
 <h4 class="author">Eric R. Scott</h4>
-<h4 class="date">03 March, 2022</h4>
+<h4 class="date">07 March, 2022</h4>
 
 </div>
 
@@ -1700,28 +1700,28 @@ So <code>jul_herbivory</code> is small mammal herbivory and <code>late_herbivory
 </ul>
 <pre><code>## Permutation test for rda under reduced model
 ## Permutation: free
-## Number of permutations: 999
+## Number of permutations: 1000
 ## 
 ## Model: rda(formula = nutr_df[&quot;nutr&quot;] ~ historical * current + jul_herbivory + late_herbivory + Condition(house), data = nutr_df, scale = FALSE)
-##          Df Variance      F Pr(&gt;F)   
-## Model    10   3.0299 2.1664  0.002 **
-## Residual 40   5.5944                 
+##          Df Variance      F   Pr(&gt;F)    
+## Model    10   3.0299 2.1664 0.000999 ***
+## Residual 40   5.5944                    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>An omnibus permutation test shows that the overall RDA is significant (<strong><span class="math inline">\(F = 2.16\)</span></strong>, <span class="math inline">\(p = 0.002\)</span>).</p>
 <pre><code>## Permutation test for rda under reduced model
 ## Type II tests
 ## Permutation: free
-## Number of permutations: 999
+## Number of permutations: 1000
 ## 
 ## Model: rda(formula = nutr_df[&quot;nutr&quot;] ~ historical * current + jul_herbivory + late_herbivory + Condition(house), data = nutr_df, scale = FALSE)
-##                    Df Variance      F Pr(&gt;F)    
-## historical          2   0.8484 3.0331  0.007 ** 
-## current             2   1.0498 3.7530  0.001 ***
-## jul_herbivory       1   0.5150 3.6822  0.012 *  
-## late_herbivory      1   0.1082 0.7737  0.525    
-## historical:current  4   0.7445 1.3308  0.177    
-## Residual           40   5.5944                  
+##                    Df Variance      F   Pr(&gt;F)   
+## historical          2   0.8484 3.0331 0.008991 **
+## current             2   1.0498 3.7530 0.002997 **
+## jul_herbivory       1   0.5150 3.6822 0.011988 * 
+## late_herbivory      1   0.1082 0.7737 0.528472   
+## historical:current  4   0.7445 1.3308 0.179820   
+## Residual           40   5.5944                   
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>Historical treatment, current treatment, and early herbivory all significantly affected nutrients.</p>
@@ -1829,28 +1829,28 @@ Might be separation due to herbivory (not plotted)?
 <p>Omnibus test:</p>
 <pre><code>## Permutation test for rda under reduced model
 ## Permutation: free
-## Number of permutations: 999
+## Number of permutations: 1000
 ## 
 ## Model: rda(formula = nutr_df[&quot;nutr&quot;] ~ historical * current + jul_herbivory + late_herbivory + Condition(house), data = nutr_df, scale = FALSE)
-##          Df Variance      F Pr(&gt;F)  
-## Model    10   2.3771 1.5185  0.011 *
-## Residual 40   6.2616                
+##          Df Variance      F  Pr(&gt;F)  
+## Model    10   2.3771 1.5185 0.01099 *
+## Residual 40   6.2616                 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>marginal effects test:</p>
 <pre><code>## Permutation test for rda under reduced model
 ## Type II tests
 ## Permutation: free
-## Number of permutations: 999
+## Number of permutations: 1000
 ## 
 ## Model: rda(formula = nutr_df[&quot;nutr&quot;] ~ historical * current + jul_herbivory + late_herbivory + Condition(house), data = nutr_df, scale = FALSE)
-##                    Df Variance      F Pr(&gt;F)   
-## historical          2   0.3046 0.9729  0.467   
-## current             2   0.9534 3.0452  0.002 **
-## jul_herbivory       1   0.0650 0.4155  0.908   
-## late_herbivory      1   0.1773 1.1327  0.335   
-## historical:current  4   0.7981 1.2746  0.167   
-## Residual           40   6.2616                 
+##                    Df Variance      F   Pr(&gt;F)   
+## historical          2   0.3046 0.9729 0.467532   
+## current             2   0.9534 3.0452 0.001998 **
+## jul_herbivory       1   0.0650 0.4155 0.907093   
+## late_herbivory      1   0.1773 1.1327 0.334665   
+## historical:current  4   0.7981 1.2746 0.167832   
+## Residual           40   6.2616                   
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <ul>
@@ -1943,12 +1943,12 @@ Might be separation due to herbivory (not plotted)?
 <p>omnibus test:</p>
 <pre><code>## Permutation test for rda under reduced model
 ## Permutation: free
-## Number of permutations: 999
+## Number of permutations: 1000
 ## 
 ## Model: rda(formula = nutr_df[&quot;nutr&quot;] ~ historical * current + jul_herbivory + late_herbivory + Condition(house), data = nutr_df, scale = FALSE)
-##          Df Variance      F Pr(&gt;F)  
-## Model    10   2.1566 1.5097   0.06 .
-## Residual 34   4.8569                
+##          Df Variance      F  Pr(&gt;F)  
+## Model    10   2.1566 1.5097 0.06194 .
+## Residual 34   4.8569                 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p><strong>Not significant, go no further?</strong></p>
@@ -1956,16 +1956,16 @@ Might be separation due to herbivory (not plotted)?
 <pre><code>## Permutation test for rda under reduced model
 ## Type II tests
 ## Permutation: free
-## Number of permutations: 999
+## Number of permutations: 1000
 ## 
 ## Model: rda(formula = nutr_df[&quot;nutr&quot;] ~ historical * current + jul_herbivory + late_herbivory + Condition(house), data = nutr_df, scale = FALSE)
-##                    Df Variance      F Pr(&gt;F)    
-## historical          2   0.1379 0.4825  0.892    
-## current             2   1.3388 4.6859  0.001 ***
-## jul_herbivory       1   0.1204 0.8426  0.487    
-## late_herbivory      1   0.3740 2.6185  0.074 .  
-## historical:current  4   0.2783 0.4870  0.964    
-## Residual           34   4.8569                  
+##                    Df Variance      F   Pr(&gt;F)    
+## historical          2   0.1379 0.4825 0.894106    
+## current             2   1.3388 4.6859 0.000999 ***
+## jul_herbivory       1   0.1204 0.8426 0.487512    
+## late_herbivory      1   0.3740 2.6185 0.073926 .  
+## historical:current  4   0.2783 0.4870 0.964036    
+## Residual           34   4.8569                    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <ul>
@@ -2119,10 +2119,10 @@ Wickham, H., 2016. Ggplot2: <span>Elegant</span> graphics for data analysis. <sp
 <summary>
 <p>Reproducibility receipt</p>
 </summary>
-<pre><code>## [1] &quot;2022-03-03 16:01:39 EST&quot;</code></pre>
+<pre><code>## [1] &quot;2022-03-07 10:10:23 EST&quot;</code></pre>
 <pre><code>## Local:    master /Users/scottericr/Documents/GitHub/BACE-legacy-effects
 ## Remote:   master @ origin (https://github.com/Aariq/BACE-legacy-effects.git)
-## Head:     [8580215] 2022-03-03: remove zinc from analyses (#18)</code></pre>
+## Head:     [30d05ee] 2022-03-03: update outputs after removing zinc (#18)</code></pre>
 <pre><code>## R version 4.0.2 (2020-06-22)
 ## Platform: x86_64-apple-darwin17.0 (64-bit)
 ## Running under: macOS  10.16

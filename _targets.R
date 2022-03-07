@@ -133,6 +133,6 @@ tar_plan(
              format = "file"),
   
   # Report for coauthors ------
-  tar_render(report, "docs/index.Rmd")
+  tar_render(report, "docs/results.Rmd")
   
 )

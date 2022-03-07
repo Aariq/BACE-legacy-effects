@@ -82,6 +82,16 @@ tar_plan(
   oat_cor  = plot_rda_cor(oat_rda),
   
   rda_plot = make_rda_plot(kale_score, bean_score, oat_score, kale_cor, bean_cor, oat_cor),
+  tar_target(rda_plot_png,
+             ggsave(here("docs", "figs", "RDA.png"),
+                    rda_plot,
+                    width = 6.5, height = 8),
+             format = "file"),
+  tar_target(rda_plot_pdf,
+             ggsave(here("docs", "figs", "RDA.pdf"),
+                    rda_plot,
+                    width = 6.5, height = 8),
+             format = "file"),
   
   # Nutrient boxplots --------
   

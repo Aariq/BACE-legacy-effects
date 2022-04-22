@@ -193,14 +193,13 @@ ANOVAs
 
 ```{r}
 # fit all the linear models
-kale_lms <-
-  map(
-    c("fe", "n", "mg", "ca", "k"),
-    ~glue::glue("log({.x}) ~ historical + current + jul_herbivory + house") %>%
-      as.formula()
-  ) %>%
-  map(~lm(.x, data = tar_read(kale_nutr))) %>%
-  set_names(c("Fe", "N", "Mg", "Ca", "K"))
+kale_lms <- list(
+  Fe = lm(log(fe) ~ historical + current + jul_herbivory + house, data = kale_nutr),
+  N  = lm(log(n)  ~ historical + current + jul_herbivory + house, data = kale_nutr),
+  Mg = lm(log(mg) ~ historical + current + jul_herbivory + house, data = kale_nutr),
+  Ca = lm(log(ca) ~ historical + current + jul_herbivory + house, data = kale_nutr),
+  K  = lm(log(k)  ~ historical + current + jul_herbivory + house, data = kale_nutr)
+)
 ```
 
 I'm not going to adjust p-values *within* each ANOVA, but just keep in mind it's a lot of p-values, so Type I error might be high.
@@ -211,6 +210,7 @@ kale_anovas <-
   map(~Anova(.x), .id = "nutrient")
 kale_anovas
 ```
+
 
 ### Beans
 
@@ -249,13 +249,13 @@ ANOVAs
 ```{r}
 # fit all the linear models
 bean_lms <- 
-  map(
-    c("fe", "n", "mg", "ca", "k"),
-    ~glue::glue("log({.x}) ~ historical + current + jul_herbivory + house") %>% 
-      as.formula()
-  ) %>% 
-  map(~lm(.x, data = tar_read(bean_nutr))) %>% 
-  set_names(c("Fe", "N", "Mg", "Ca", "K"))
+  list(
+    "Fe" = lm(log(fe)~ historical + current + jul_herbivory + house, data = bean_nutr),
+    "N"  = lm(log(n) ~ historical + current + jul_herbivory + house, data = bean_nutr),
+    "Mg" = lm(log(mg)~ historical + current + jul_herbivory + house, data = bean_nutr),
+    "Ca" = lm(log(ca)~ historical + current + jul_herbivory + house, data = bean_nutr),
+    "K"  = lm(log(k) ~ historical + current + jul_herbivory + house, data = bean_nutr)
+  )
 ```
 
 
@@ -305,13 +305,13 @@ ANOVAs
 ```{r}
 # fit all the linear models
 oat_lms <- 
-  map(
-    c("fe", "n", "mg", "ca", "k"),
-    ~glue::glue("log({.x}) ~ historical + current + jul_herbivory + house") %>% 
-      as.formula()
-  ) %>% 
-  map(~lm(.x, data = tar_read(oat_nutr))) %>% 
-  set_names(c("Fe", "N", "Mg", "Ca", "K"))
+  list(
+    "Fe" = lm(log(fe)~ historical + current + jul_herbivory + house, data = oat_nutr),
+    "N"  = lm(log(n) ~ historical + current + jul_herbivory + house, data = oat_nutr),
+    "Mg" = lm(log(mg)~ historical + current + jul_herbivory + house, data = oat_nutr),
+    "Ca" = lm(log(ca)~ historical + current + jul_herbivory + house, data = oat_nutr),
+    "K"  = lm(log(k) ~ historical + current + jul_herbivory + house, data = oat_nutr)
+  )
 ```
 
 
@@ -322,6 +322,56 @@ oat_anovas <-
 oat_anovas
 ```
 
+## Effects of Herbivory on Nutrients
+
+In what way does herbivory influence nutrient concentration?
+
+For all of the results shown in this section:
+
+- Concentrations are averaged over the levels of: historical, current, house 
+- Confidence level used: 0.95 
+- Intervals are back-transformed from the log scale 
+- Fe is in ppm while other nutrients are percentages
+
+```{r}
+library(emmeans)
+```
+
+### Kale 
+
+```{r}
+map_df(kale_lms,
+       ~ tidy(summary(emmeans(.x, ~ jul_herbivory, type = "response"))), 
+       .id = "nutrient") %>% 
+  select(-df) %>% 
+  rename(conc = response)
+```
+
+In Kale, herbivory consistently reduces nutrient content (although 95% CIs overlap for N, Mg, Ca, and K)
+
+### Beans
+
+```{r}
+map_df(bean_lms,
+       ~ tidy(summary(emmeans(.x, ~ jul_herbivory, type = "response"))), 
+       .id = "nutrient") %>% 
+  select(-df) %>% 
+  rename(conc = response)
+```
+
+For beans, herbivory consistently reduces nutrient content (although 95% CIs overlap for all nutrients)
+
+### Oats
+
+```{r}
+map_df(oat_lms,
+       ~ tidy(summary(emmeans(.x, ~ jul_herbivory, type = "response"))), 
+       .id = "nutrient") %>% 
+  select(-df) %>% 
+  rename(conc = response)
+```
+
+For oats, herbivory reduced Fe, Mg, Ca, and K (although 95% CIs overlap for all) and increased N (again, not "significantly" because 95% CIs overlap)
 
 # Biomass Analysis
 

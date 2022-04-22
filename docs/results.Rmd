@@ -200,25 +200,13 @@ kale_lms <-
   set_names(c("Fe", "N", "Mg", "Ca", "K"))
 ```
 
-Wald tests for overall significance of post-hoc ANOVAs, with false discovery rate adjusted p-values
-
-```{r}
-kale_wald <-
-  kale_lms %>%
-  map_df(~tidy(waldtest(.x)), .id = "nutrient") %>%
-  mutate(p.adj = p.adjust(p.value, method = "fdr")) %>% 
-  filter(!is.na(df)) %>% 
-  select(-res.df)
-kale_wald
-```
-
-The model for K is not significantly better than an intercept-only model, so I won't look at the ANOVA for it. I'm not going to adjust p-values *within* each ANOVA, but just keep in mind it's a lot of p-values, so Type I error might be high.
+I'm not going to adjust p-values *within* each ANOVA, but just keep in mind it's a lot of p-values, so Type I error might be high.
 
 ```{r}
 kale_anovas <-
   kale_lms %>%
   map(~Anova(.x), .id = "nutrient")
-kale_anovas[names(kale_anovas) != "K"]
+kale_anovas
 ```
 
 ### Beans
@@ -266,25 +254,13 @@ bean_lms <-
   set_names(c("Fe", "N", "Mg", "Ca", "K"))
 ```
 
-Wald tests for overall significance of post-hoc ANOVAs, with false discovery rate adjusted p-values
 
-```{r}
-bean_wald <-
-  bean_lms %>%
-  map_df(~tidy(lmtest::waldtest(.x)), .id = "nutrient") %>% 
-  mutate(p.adj = p.adjust(p.value, method = "fdr")) %>% 
-  filter(!is.na(df)) %>% 
-  select(-res.df)
-bean_wald
-```
-
-Calcium not significant
 
 ```{r}
 bean_anovas <- 
   bean_lms %>% 
   map(~Anova(.x), .id = "nutrient")
-bean_anovas[names(bean_anovas) != "Ca"]
+bean_anovas
 ```
 
 ### Oats
@@ -333,19 +309,6 @@ oat_lms <-
   set_names(c("Fe", "N", "Mg", "Ca", "K"))
 ```
 
-Wald tests for overall significance of post-hoc ANOVAs, with false discovery rate adjusted p-values
-
-```{r}
-oat_wald <-
-  oat_lms %>%
-  map_df(~tidy(lmtest::waldtest(.x)), .id = "nutrient") %>% 
-  mutate(p.adj = p.adjust(p.value, method = "fdr")) %>% 
-  filter(!is.na(df)) %>% 
-  select(-res.df)
-oat_wald
-```
-
-All are significant
 
 ```{r}
 oat_anovas <- 

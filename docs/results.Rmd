@@ -143,6 +143,7 @@ So `jul_herbivory` is small mammal herbivory and `late_herbivory` is just the in
 
 ### Kale
 
+#### Multivariate
 
 ```{r}
 MVA.synt(kale_rda)
@@ -180,13 +181,15 @@ Separation by historical and current treatment is minimal in the score plot (Fig
 Might be separation due to herbivory (not plotted)?
 **note that none of the variables are over the 0.5 correlation threshold (i.e. all the arrows in \@ref(fig:rda)a are grey)**
 
-#### Followup ANOVAs
+#### Univariate
 
 Boxplot
 
 ```{r fig.height=4, fig.width=6.5}
 kale_boxplot
 ```
+
+ANOVAs
 
 ```{r}
 # fit all the linear models
@@ -211,6 +214,7 @@ kale_anovas
 
 ### Beans
 
+#### Multivariate
 
 ```{r}
 MVA.synt(bean_rda)
@@ -231,7 +235,7 @@ MVA.anova(bean_rda, permutations = 1000)
 -   Only current treatment significant.
 -   Figure \@ref(fig:rda)c,d
 
-#### Followup ANOVAs
+#### Univariate
 
 Boxplot
 
@@ -240,14 +244,14 @@ bean_boxplot
 ```
 
 
-Only including "current" and "house"
+ANOVAs
 
 ```{r}
 # fit all the linear models
 bean_lms <- 
   map(
     c("fe", "n", "mg", "ca", "k"),
-    ~glue::glue("log({.x}) ~ current + house") %>% 
+    ~glue::glue("log({.x}) ~ historical + current + jul_herbivory + house") %>% 
       as.formula()
   ) %>% 
   map(~lm(.x, data = tar_read(bean_nutr))) %>% 
@@ -265,6 +269,7 @@ bean_anovas
 
 ### Oats
 
+#### Multivariate
 
 ```{r}
 MVA.synt(oat_rda)
@@ -287,7 +292,7 @@ MVA.anova(oat_rda, permutations = 1000)
 -   Only current treatment is significant
 -   Figure \@ref(fig:rda)e,f
 
-#### Followup ANOVAs
+#### Univariate
 
 Boxplot
 
@@ -295,14 +300,14 @@ Boxplot
 oat_boxplot
 ```
 
-Only including "current" and "house"
+ANOVAs
 
 ```{r}
 # fit all the linear models
 oat_lms <- 
   map(
     c("fe", "n", "mg", "ca", "k"),
-    ~glue::glue("log({.x}) ~ current + house") %>% 
+    ~glue::glue("log({.x}) ~ historical + current + jul_herbivory + house") %>% 
       as.formula()
   ) %>% 
   map(~lm(.x, data = tar_read(oat_nutr))) %>% 

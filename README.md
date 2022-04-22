@@ -1,6 +1,7 @@
 # BACE-legacy-effects
 
 <!-- badges: start -->
+[![DOI](https://zenodo.org/badge/370156054.svg)](https://zenodo.org/badge/latestdoi/370156054)
 
 <!-- badges: end -->
 

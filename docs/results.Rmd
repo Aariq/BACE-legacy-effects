@@ -46,6 +46,8 @@ withr::with_dir(here::here(), {
 })
 ```
 
+All analyses conducted with R `r version$version.string` [@rcoreteamLanguageEnvironmentStatistical2020].
+
 # Longitudinal Growth
 
 ## Methods
@@ -98,6 +100,7 @@ Anova(b_ht)
 
 -   days = significant growth (change in height over time)
 -   days:hist_treat = different slopes (height over time) for different historical treatments (Figure \@ref(fig:slopes)b).
+-   
 
 ### Oats
 
@@ -110,8 +113,7 @@ Anova(o_ht)
 -   curr_treat = different intercepts for different treatments
 -   days:curr_treat = different slopes (height over time) for different current treatments
 -   days:hist_treat:curr_treat = hard to interpret, especially since no main effects
--   Figure \@ref(fig:slopes)c
-
+-   Figure \@ref(fig:slopes)
 
 # Nutrient Analysis
 
@@ -125,7 +127,8 @@ Partial RDA was performed on centered and scaled nutrient data using the `rda` f
 RDA significance was determined with permutation tests performed using the `RVAideMemoire` package [@herveRVAideMemoireTestingPlotting2021].
 Score plots and correlation plots were produced using packages `ggplot2` [@wickhamGgplot2ElegantGraphics2016], `ggrepel` [@slowikowskiGgrepelAutomaticallyPosition2021], and `ggpubr` [@kassambaraGgpubrGgplot2Based2020].
 
-When the RDA was significant, we followed up with univariate ANOVAs for log-transformed concentrations of Fe, N, Ca, Mg, and K. **Only factors found significant in the RDA were included in the post-hoc ANOVA models and only statistically significant ANOVA models (false discovery rate adjusted Wald test p-values < 0.05) were analyzed.**
+When the RDA was significant, we followed up with univariate ANOVAs for log-transformed concentrations of Fe, N, Ca, Mg, and K.
+**Only factors found significant in the RDA were included in the post-hoc ANOVA models and only statistically significant ANOVA models (false discovery rate adjusted Wald test p-values \< 0.05) were analyzed.**
 
 **NOTE**: From the help file for `rda()` in case it is helpful for revising the methods:
 
@@ -157,14 +160,13 @@ MVA.synt(kale_rda)
 anova(kale_rda, permutations = 1000)
 ```
 
-An omnibus permutation test shows that the overall RDA is significant (**$F = 2.16$**, $p = 0.002$).
+An omnibus permutation test shows that the overall RDA is significant ($F = 2.16$, $p = 0.002$).
 
 ```{r}
 MVA.anova(kale_rda, permutations = 1000)
 ```
 
 Historical treatment, current treatment, and early herbivory all significantly affected nutrients.
-
 
 ```{r}
 #|  rda, fig.height=8, fig.width=6.5,
@@ -179,7 +181,7 @@ The first constrained component (the one that explains most of the variation due
 This axis is negatively correlated with Fe, Cu, K, Al, etc (Figure \@ref(fig:rda)a).
 Separation by historical and current treatment is minimal in the score plot (Figure \@ref(fig:rda)b).
 Might be separation due to herbivory (not plotted)?
-**note that none of the variables are over the 0.5 correlation threshold (i.e. all the arrows in \@ref(fig:rda)a are grey)**
+**note that none of the variables are over the 0.5 correlation threshold (i.e. all the arrows in** \@ref(fig:rda)**a are grey)**
 
 #### Univariate
 
@@ -210,7 +212,6 @@ kale_anovas <-
   map(~Anova(.x), .id = "nutrient")
 kale_anovas
 ```
-
 
 ### Beans
 
@@ -243,7 +244,6 @@ Boxplot
 bean_boxplot
 ```
 
-
 ANOVAs
 
 ```{r}
@@ -257,8 +257,6 @@ bean_lms <-
     "K"  = lm(log(k) ~ historical + current + jul_herbivory + house, data = bean_nutr)
   )
 ```
-
-
 
 ```{r}
 bean_anovas <- 
@@ -314,7 +312,6 @@ oat_lms <-
   )
 ```
 
-
 ```{r}
 oat_anovas <- 
   oat_lms %>% 
@@ -328,16 +325,16 @@ In what way does herbivory influence nutrient concentration?
 
 For all of the results shown in this section:
 
-- Concentrations are averaged over the levels of: historical, current, house 
-- Confidence level used: 0.95 
-- Intervals are back-transformed from the log scale 
-- Fe is in ppm while other nutrients are percentages
+-   Concentrations are averaged over the levels of: historical, current, house
+-   Confidence level used: 0.95
+-   Intervals are back-transformed from the log scale
+-   Fe is in ppm while other nutrients are percentages
 
 ```{r}
 library(emmeans)
 ```
 
-### Kale 
+### Kale
 
 ```{r}
 map_df(kale_lms,

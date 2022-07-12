@@ -17,7 +17,7 @@ This research compendium makes use of the [`targets`](https://books.ropensci.org
 
 1. Clone this repository
 2. Open it in RStudio
-3. Install dependencies by running `renv::restore()`
+3. Install dependencies by running `renv::restore()` (NOTE: you may need to install `gfortran` if you don't have it in order to compile some packages from source.  Install from here: https://cran.r-project.org/bin/macosx/tools/)
 4. Run analysis pipeline with `targets::tar_make()`
 
 To reproduce the analysis, fork this repository, clone it, open it in RStudio, install the `targets` package as well as all packages in `packages.R`. Then run `targets::tar_make()`.

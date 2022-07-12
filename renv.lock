@@ -1154,10 +1154,10 @@
     },
     "rlang": {
       "Package": "rlang",
-      "Version": "0.4.11",
+      "Version": "1.0.4",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "515f341d3affe0de9e4a7f762efb0456"
+      "Hash": "6539dd8c651e67e3b55b5ffea106362b"
     },
     "rmarkdown": {
       "Package": "rmarkdown",

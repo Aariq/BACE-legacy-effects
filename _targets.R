@@ -95,9 +95,9 @@ tar_plan(
   
   # Nutrient boxplots --------
   
-  kale_boxplot = plot_nutr_boxplot(kale_nutr),
-  bean_boxplot = plot_nutr_boxplot(bean_nutr),
-  oat_boxplot  = plot_nutr_boxplot(oat_nutr),
+  kale_boxplot = plot_nutr_boxplot(kale_nutr) %>% shift_legend(),
+  bean_boxplot = plot_nutr_boxplot(bean_nutr) %>% shift_legend(),
+  oat_boxplot  = plot_nutr_boxplot(oat_nutr)  %>% shift_legend(),
   
   tar_target(kale_boxplot_png,
              ggsave(here("docs", "figs", "kale_boxplot.png"), 

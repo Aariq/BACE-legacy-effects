@@ -37,9 +37,9 @@ make_growth_fig <- function(longdata) {
   beans <- longdata %>% filter(species == "beans")
   oats <-  longdata %>% filter(species == "oats")
   
-  p_kale <- make_growth_panel(kale, range(longdata$date))
-  p_beans <- make_growth_panel(beans, range(longdata$date))
-  p_oats <- make_growth_panel(oats, range(longdata$date))
+  p_kale <- make_growth_panel(kale, range(longdata$date)) + labs(title = "Kale")
+  p_beans <- make_growth_panel(beans, range(longdata$date)) + labs(title = "Beans")
+  p_oats <- make_growth_panel(oats, range(longdata$date)) + labs(title = "Oats")
   
   rm_axis <- theme(axis.title.x = element_blank(),
                    axis.text.x = element_blank(),

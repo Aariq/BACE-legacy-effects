@@ -38,9 +38,9 @@ tar_plan(
   tar_render(model_validation, "docs/model_validation.Rmd"),
   
   # plot slopes ------------
-  k_slopes = plot_slopes_panel(k_ht),
-  b_slopes = plot_slopes_panel(b_ht),
-  o_slopes = plot_slopes_panel(o_ht, exp = FALSE),
+  k_slopes = plot_slopes_panel(k_ht) + labs(title = "Kale"),
+  b_slopes = plot_slopes_panel(b_ht) + labs(title = "Beans"),
+  o_slopes = plot_slopes_panel(o_ht, exp = FALSE) + labs(title = "Oats"),
   slopes_plot = plot_slopes(k_slopes, b_slopes, o_slopes),
   tar_target(slopes_fig_png,
              ggsave(here("docs", "figs", "slopes.png"), slopes_plot),
@@ -95,9 +95,9 @@ tar_plan(
   
   # Nutrient boxplots --------
   
-  kale_boxplot = plot_nutr_boxplot(kale_nutr),
-  bean_boxplot = plot_nutr_boxplot(bean_nutr),
-  oat_boxplot  = plot_nutr_boxplot(oat_nutr),
+  kale_boxplot = plot_nutr_boxplot(kale_nutr) %>% shift_legend(),
+  bean_boxplot = plot_nutr_boxplot(bean_nutr) %>% shift_legend(),
+  oat_boxplot  = plot_nutr_boxplot(oat_nutr)  %>% shift_legend(),
   
   tar_target(kale_boxplot_png,
              ggsave(here("docs", "figs", "kale_boxplot.png"), 

@@ -120,7 +120,7 @@ plot_rda_cor <- function(rda, thresh = 0.5) {
 }
 
 make_rda_plot <- function(kale_score, bean_score, oat_score, kale_cor, bean_cor, oat_cor) {
-  kale_cor + kale_score +
+    kale_cor + kale_score +
     bean_cor + bean_score +
     oat_cor  + oat_score  +
     plot_layout(ncol = 2, guides = "collect") & 

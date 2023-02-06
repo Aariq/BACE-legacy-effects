@@ -48,3 +48,4 @@ _targets/
 *.pdf
 !doc/report.html
 !index.html
+*.tiff

@@ -32,10 +32,11 @@ plot_slopes_panel <- function(model, exp = TRUE, conf = 0.84) {
       ),
       position = position_dodge(width = 0.2)
     ) +
-    scale_color_viridis_d("Current", begin = .25, end = 0.95) +
+    # scale_color_viridis_d("Current", begin = .25, end = 0.95) +
+    scale_color_manual("Current", values = c("ambient" = "#7570B3", "75%" = "#1B9E77", "50%" = "#D95F02")) +
     scale_shape_discrete("Current", solid = TRUE) +
     labs(
-      x = "Historical") + 
+      x = "Legacy") + 
     theme_bw() 
     
 }

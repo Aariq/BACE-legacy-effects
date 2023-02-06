@@ -11,8 +11,9 @@ plot_nutr_boxplot <- function(data) {
   ggplot(df, aes(x = historical, y = conc, fill = current)) + 
     geom_boxplot(outlier.size = 0.8, size = 0.3) +
     scale_y_continuous(breaks = scales::breaks_pretty()) +
-    scale_fill_viridis_d("Current", begin = .25, end = 0.95) +
+    # scale_fill_viridis_d("Current", begin = .25, end = 0.95) +
+    scale_fill_manual("Current", values = c("ambient" = "#7570B3", "75%" = "#1B9E77", "50%" = "#D95F02")) +
     facet_wrap(~nutrient, scales = "free_y") +
     theme_bw() +
-    labs(x = "Historical", y = "% Dry Weight")
+    labs(x = "Legacy", y = "% Dry Weight")
 }

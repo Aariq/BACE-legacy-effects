@@ -5,8 +5,9 @@ make_longfig <- function(longdata) {
     facet_wrap(~fct_relevel(species, "kale", "beans", "oats"), scales = "free_y", ncol = 1) +
     scale_x_datetime("Date", date_breaks = "1 week", date_labels = "%m/%d") +
     scale_y_continuous("Height (cm)") +
-    scale_color_viridis_d("Current", begin = .25, end = 0.95) +
-    scale_linetype_manual("Historical", values = c("solid", "longdash", "dotted")) +
+    # scale_color_viridis_d("Current", begin = .25, end = 0.95) +
+    scale_color_manual("Current", values = c("ambient" = "#7570B3", "75%" = "#1B9E77", "50%" = "#D95F02")) +
+    scale_linetype_manual("Legacy", values = c("solid", "longdash", "dotted")) +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
   return(p)
@@ -25,8 +26,9 @@ make_growth_panel <- function(species_data, date_lims) {
       limits = date_lims
     )+
     scale_y_continuous("Height (cm)", breaks = breaks_width(10)) +
-    scale_color_viridis_d("Current", begin = .25, end = 0.95) +
-    scale_linetype_manual("Historical", values = c("solid", "longdash", "dotted")) +
+    # scale_color_viridis_d("Current", begin = .25, end = 0.95) +
+    scale_color_manual("Current", values = c("ambient" = "#7570B3", "75%" = "#1B9E77", "50%" = "#D95F02")) +
+    scale_linetype_manual("Legacy", values = c("solid", "longdash", "dotted")) +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }

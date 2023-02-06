@@ -9,9 +9,10 @@ plot_rda_scores <- function(rda, data) {
     stat_chull(geom = "polygon", alpha = 0.4, color = "black") +
     geom_point(aes(shape = historical), color = "black", size = 2, stroke = 0.75) +
     # Scales and legends
-    scale_fill_viridis_d("Current", begin = .25, end = 0.95) +
+    # scale_fill_viridis_d("Current", begin = .25, end = 0.95) +
+    scale_fill_manual("Current", values = c("ambient" = "#7570B3", "75%" = "#1B9E77", "50%" = "#D95F02")) +
     scale_linetype_manual("Current", values = c("solid", "longdash", "dotted")) +
-    scale_shape_discrete("Historical", solid = FALSE) +
+    scale_shape_discrete("Legacy", solid = FALSE) +
     guides(fill = guide_legend(override.aes = list(shape = NA))) +
     labs(
       x = glue::glue("Constr. comp. 1 ({MVA.synt(rda)[[2]]$tab[1,2] %>% round(2)}%)"),

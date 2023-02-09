@@ -13,20 +13,20 @@ tar_plan(
   # longitudinal data
   tar_target(longdata_file, here("data","longdata.xlsx"), format = "file"),
   longdata = read_wrangle_longdata(longdata_file),
-
+  
+  # establish cutoffs for exponential growth period
+  oat_cutoff = ymd("2018-08-07"),
+  bean_cutoff = ymd("2018-07-31"),
+  
   # Descriptive plots ------------
   longfig = make_longfig(longdata),
-  growth_fig = make_growth_fig(longdata),
+  growth_fig = make_growth_fig(longdata, oat_cutoff, bean_cutoff),
   tar_target(growth_fig_png,
              ggsave(here("docs", "figs", "growth.png"), growth_fig),
              format = "file"),
   tar_target(growth_fig_tiff,
              ggsave(here("docs", "figs", "growth.tiff"), growth_fig), 
              format = "file"),
-  
-  # establish cutoffs for exponential growth period
-  oat_cutoff = ymd("2018-08-07"),
-  bean_cutoff = ymd("2018-07-31"),
   
   # fit models for height change ----------
   k_ht = fit_ht(longdata %>% filter(species == "kale")),

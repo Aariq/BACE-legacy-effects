@@ -46,6 +46,6 @@ _targets/
 *.docx
 *.nb.html
 *.pdf
-!doc/report.html
+!docs/results.html
 !index.html
 *.tiff

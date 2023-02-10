@@ -7,7 +7,7 @@
 
 Data analysis for a project at the Boston Area Climate Experiment (BACE) looking at legacy effects of precipitation treatments on crop growth and nutrients.
 
-[Report for co-authors](https://aariq.github.io/BACE-legacy-effects/)
+[Report for co-authors](https://aariq.github.io/BACE-legacy-effects/results.html)
 
 # Reproducibility
 

@@ -106,7 +106,7 @@ plot_rda_cor <- function(rda, thresh = 0.5) {
       nudge_y = cor_df$yplus * .01,
       seed = 678
     ) +
-    scale_alpha_manual(values = c(0.5, 1)) +
+    scale_alpha_manual(values = c('FALSE' = 0.5, 'TRUE' = 1)) +
     scale_x_continuous(
       glue::glue("Constr. comp. 1 ({MVA.synt(rda)[[2]]$tab[1,2] %>% round(2)}%)"),
       limits = symmetric_limits

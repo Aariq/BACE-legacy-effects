@@ -98,6 +98,7 @@ tar_plan(
   kale_boxplot = plot_nutr_boxplot(kale_nutr) %>% shift_legend(),
   bean_boxplot = plot_nutr_boxplot(bean_nutr) %>% shift_legend(),
   oat_boxplot  = plot_nutr_boxplot(oat_nutr)  %>% shift_legend(),
+  multipanel_boxplot = wrap_elements(kale_boxplot) / wrap_elements(bean_boxplot) / wrap_elements(oat_boxplot) + plot_annotation(tag_levels = "a"),
   
   tar_target(kale_boxplot_png,
              ggsave(here("docs", "figs", "kale_boxplot.png"), 
@@ -130,6 +131,16 @@ tar_plan(
              ggsave(here("docs", "figs", "oat_boxplot.tiff"), 
                     oat_boxplot,
                     width = 6.5, height = 4),
+             format = "file"),
+  tar_target(multipanel_boxplot_png,
+             ggsave(here('docs', 'figs', 'multipanel.png'),
+                    multipanel_boxplot,
+                    width = 6.5, height = 12),
+             format = "file"),
+  tar_target(multipanel_boxplot_tiff,
+             ggsave(here('docs', 'figs', 'multipanel.tiff'),
+                    multipanel_boxplot,
+                    width = 6.5, height = 12),
              format = "file"),
   
   # Report for coauthors ------

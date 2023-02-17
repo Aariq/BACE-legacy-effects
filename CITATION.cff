@@ -1,10 +1,11 @@
 cff-version: 1.2.0
 message: "If you use this code or data, please cite it as below"
 authors:
-  - family-names: Scott
-    given-names: Eric R.
-    orcid: https://orcid.org/0000-0002-7430-7879
-title: Code and Data from: Current and Legacy Effects of Precipitation Treatments on Growth and Nutrition in Contrasting Crops
+  - family-names: "Scott"
+    given-names: "Eric R."
+    orcid: "https://orcid.org/0000-0002-7430-7879"
+title: "Code and Data from: Current and Legacy Effects of Precipitation Treatments on Growth and Nutrition in Contrasting Crops"
 version: v1.0
 doi: 10.5281/zenodo.6478160
+url: "https://github.com/Aariq/BACE-legacy-effects"
 date-released: 2023-02-17

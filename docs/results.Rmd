@@ -40,8 +40,7 @@ withr::with_dir(here::here(), {
     targets::ends_with("rda"),
     targets::ends_with("nutr"),
     rda_plot,
-    slopes_plot,
-    targets::ends_with("boxplot")
+    slopes_plot
   ))
 })
 ```
@@ -187,9 +186,7 @@ Might be separation due to herbivory (not plotted)?
 
 Boxplot
 
-```{r fig.height=4, fig.width=6.5}
-kale_boxplot
-```
+![](figs/kale_boxplot.png)
 
 ANOVAs
 
@@ -240,9 +237,7 @@ MVA.anova(bean_rda, permutations = 1000)
 
 Boxplot
 
-```{r fig.height=4, fig.width=6.5}
-bean_boxplot
-```
+![](figs/bean_boxplot.png)
 
 ANOVAs
 
@@ -294,9 +289,7 @@ MVA.anova(oat_rda, permutations = 1000)
 
 Boxplot
 
-```{r fig.height=4, fig.width=6.5}
-oat_boxplot
-```
+![](figs/oat_boxplot.png)
 
 ANOVAs
 
@@ -432,11 +425,7 @@ No significant effect on root:shoot ratio
 
 <details>
 
-<summary>
-
-Reproducibility receipt
-
-</summary>
+<summary>Reproducibility receipt</summary>
 
 ```{r}
 ## datetime

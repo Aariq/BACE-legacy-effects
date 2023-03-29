@@ -1862,45 +1862,137 @@ Might be separation due to herbivory (not plotted)?
 </div>
 <div id="beans-2" class="section level4" number="2.2.4.2">
 <h4><span class="header-section-number">2.2.4.2</span> Beans</h4>
-<pre><code>## # A tibble: 15 × 7
-##    Nutrient name    historical current jul_herbivory  house Residuals
-##    &lt;chr&gt;    &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;         &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
-##  1 Fe       df           2       2             1      2            45
-##  2 Fe       F            0.5     1.55          1.21   4.86         NA
-##  3 Fe       p.value      0.61    0.224         0.277  0.012        NA
-##  4 N        df           2       2             1      2            45
-##  5 N        F            1.30    2.19          3.05  10.3          NA
-##  6 N        p.value      0.282   0.124         0.088  0            NA
-##  7 Mg       df           2       2             1      2            45
-##  8 Mg       F            0.095   9.22          0.132  0.219        NA
-##  9 Mg       p.value      0.909   0             0.718  0.804        NA
-## 10 Ca       df           2       2             1      2            45
-## 11 Ca       F            1.59    0.73          0.306  3.13         NA
-## 12 Ca       p.value      0.215   0.487         0.583  0.053        NA
-## 13 K        df           2       2             1      2            45
-## 14 K        F            3.50    5.44          0.139  0.675        NA
-## 15 K        p.value      0.039   0.008         0.711  0.514        NA</code></pre>
+<pre><code>## $Fe
+## Anova Table (Type II tests)
+## 
+## Response: log(fe)
+##                Sum Sq Df F value  Pr(&gt;F)  
+## historical    0.01113  2  0.4995 0.61013  
+## current       0.03444  2  1.5463 0.22414  
+## jul_herbivory 0.01349  1  1.2110 0.27698  
+## house         0.10829  2  4.8619 0.01226 *
+## Residuals     0.50116 45                  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## $N
+## Anova Table (Type II tests)
+## 
+## Response: log(n)
+##                 Sum Sq Df F value    Pr(&gt;F)    
+## historical    0.007517  2  1.3014 0.2822029    
+## current       0.012629  2  2.1863 0.1241246    
+## jul_herbivory 0.008806  1  3.0488 0.0876207 .  
+## house         0.059578  2 10.3139 0.0002055 ***
+## Residuals     0.129971 45                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## $Mg
+## Anova Table (Type II tests)
+## 
+## Response: log(mg)
+##                 Sum Sq Df F value    Pr(&gt;F)    
+## historical    0.000822  2  0.0952 0.9093480    
+## current       0.079594  2  9.2198 0.0004407 ***
+## jul_herbivory 0.000570  1  0.1320 0.7180952    
+## house         0.001889  2  0.2188 0.8043192    
+## Residuals     0.194241 45                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## $Ca
+## Anova Table (Type II tests)
+## 
+## Response: log(ca)
+##                Sum Sq Df F value  Pr(&gt;F)  
+## historical    0.07046  2  1.5911 0.21495  
+## current       0.03234  2  0.7304 0.48732  
+## jul_herbivory 0.00679  1  0.3065 0.58259  
+## house         0.13855  2  3.1289 0.05342 .
+## Residuals     0.99633 45                  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## $K
+## Anova Table (Type II tests)
+## 
+## Response: log(k)
+##                 Sum Sq Df F value   Pr(&gt;F)   
+## historical    0.017115  2  3.5021 0.038585 * 
+## current       0.026580  2  5.4388 0.007663 **
+## jul_herbivory 0.000339  1  0.1388 0.711230   
+## house         0.003298  2  0.6748 0.514320   
+## Residuals     0.109957 45                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 <div id="oats-1" class="section level4" number="2.2.4.3">
 <h4><span class="header-section-number">2.2.4.3</span> Oats</h4>
-<pre><code>## # A tibble: 15 × 7
-##    Nutrient name    historical current jul_herbivory house Residuals
-##    &lt;chr&gt;    &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-##  1 Fe       df           2       2             1     2            39
-##  2 Fe       F            1.13   11.2           1.43  7.38         NA
-##  3 Fe       p.value      0.333   0             0.239 0.002        NA
-##  4 N        df           2       2             1     2            39
-##  5 N        F            0.22    1.24          0.605 6.78         NA
-##  6 N        p.value      0.803   0.301         0.441 0.003        NA
-##  7 Mg       df           2       2             1     2            39
-##  8 Mg       F            0.125   9.24          0.441 4.52         NA
-##  9 Mg       p.value      0.883   0.001         0.511 0.017        NA
-## 10 Ca       df           2       2             1     2            39
-## 11 Ca       F            0.093   0.923         1.18  5.73         NA
-## 12 Ca       p.value      0.912   0.406         0.284 0.007        NA
-## 13 K        df           2       2             1     2            39
-## 14 K        F            0.273   3.28          0.102 5.71         NA
-## 15 K        p.value      0.762   0.048         0.751 0.007        NA</code></pre>
+<pre><code>## $Fe
+## Anova Table (Type II tests)
+## 
+## Response: log(fe)
+##                Sum Sq Df F value    Pr(&gt;F)    
+## historical    0.13484  2  1.1298 0.3334315    
+## current       1.34230  2 11.2469 0.0001392 ***
+## jul_herbivory 0.08531  1  1.4295 0.2390582    
+## house         0.88079  2  7.3800 0.0019135 ** 
+## Residuals     2.32730 39                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## $N
+## Anova Table (Type II tests)
+## 
+## Response: log(n)
+##                Sum Sq Df F value   Pr(&gt;F)   
+## historical    0.01020  2  0.2202 0.803339   
+## current       0.05735  2  1.2376 0.301228   
+## jul_herbivory 0.01402  1  0.6052 0.441309   
+## house         0.31417  2  6.7796 0.002972 **
+## Residuals     0.90364 39                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## $Mg
+## Anova Table (Type II tests)
+## 
+## Response: log(mg)
+##                Sum Sq Df F value    Pr(&gt;F)    
+## historical    0.00372  2  0.1245 0.8832493    
+## current       0.27596  2  9.2389 0.0005194 ***
+## jul_herbivory 0.00658  1  0.4406 0.5107615    
+## house         0.13511  2  4.5233 0.0171134 *  
+## Residuals     0.58245 39                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## $Ca
+## Anova Table (Type II tests)
+## 
+## Response: log(ca)
+##               Sum Sq Df F value   Pr(&gt;F)   
+## historical    0.0182  2  0.0926 0.911769   
+## current       0.1812  2  0.9235 0.405651   
+## jul_herbivory 0.1158  1  1.1801 0.284014   
+## house         1.1245  2  5.7296 0.006583 **
+## Residuals     3.8272 39                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## $K
+## Anova Table (Type II tests)
+## 
+## Response: log(k)
+##                Sum Sq Df F value   Pr(&gt;F)   
+## historical    0.02529  2  0.2734 0.762264   
+## current       0.30364  2  3.2815 0.048175 * 
+## jul_herbivory 0.00472  1  0.1021 0.751054   
+## house         0.52860  2  5.7127 0.006669 **
+## Residuals     1.80434 39                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 </div>
 </div>
@@ -2044,7 +2136,7 @@ Wickham, H., 2016. Ggplot2: <span>Elegant</span> graphics for data analysis. <sp
 <summary>
 Reproducibility receipt
 </summary>
-<pre><code>## [1] &quot;2023-03-29 10:00:10 EDT&quot;</code></pre>
+<pre><code>## [1] &quot;2023-03-29 09:55:57 EDT&quot;</code></pre>
 <pre><code>## Local:    master /Users/ericscott/Documents/GitHub/BACE-legacy-effects
 ## Remote:   master @ origin (https://github.com/Aariq/BACE-legacy-effects.git)
 ## Head:     [9532a10] 2023-03-15: Merge pull request #31 from Aariq/citation</code></pre>
@@ -2060,57 +2152,43 @@ Reproducibility receipt
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 ## 
 ## attached base packages:
-## [1] stats     graphics  grDevices datasets  utils     methods   base     
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] cowplot_1.1.1          gtable_0.3.1           lmtest_0.9-40         
-##  [4] zoo_1.8-11             performance_0.9.2      car_3.1-0             
-##  [7] carData_3.0-5          ggpmisc_0.5.0          ggpp_0.4.4            
-## [10] glue_1.6.2             ggrepel_0.9.1          ggpubr_0.4.0          
-## [13] emmeans_1.8.1-1        scales_1.2.1           patchwork_1.1.1       
-## [16] RVAideMemoire_0.9-81-2 vegan_2.6-2            lattice_0.20-44       
-## [19] permute_0.9-7          broom.mixed_0.2.9.4    broom_1.0.1           
-## [22] rmarkdown_2.14         lme4_1.1-30            Matrix_1.5-1          
-## [25] lubridate_1.8.0        janitor_2.1.0          here_1.0.1            
-## [28] readxl_1.4.0           forcats_0.5.1          stringr_1.4.0         
-## [31] dplyr_1.0.9            purrr_0.3.4            readr_2.1.2           
-## [34] tidyr_1.2.0            tibble_3.1.8           ggplot2_3.3.6         
-## [37] tidyverse_1.3.1        tarchetypes_0.6.0      targets_0.13.1        
-## [40] dotenv_1.0.3           conflicted_1.1.0      
+##  [1] emmeans_1.8.1-1        lmtest_0.9-40          zoo_1.8-11            
+##  [4] broom_1.0.1            targets_0.13.1         vegan_2.6-2           
+##  [7] lattice_0.20-44        permute_0.9-7          RVAideMemoire_0.9-81-2
+## [10] lme4_1.1-30            Matrix_1.5-1           car_3.1-0             
+## [13] carData_3.0-5          patchwork_1.1.1        forcats_0.5.1         
+## [16] stringr_1.4.0          dplyr_1.0.9            purrr_0.3.4           
+## [19] readr_2.1.2            tidyr_1.2.0            tibble_3.1.8          
+## [22] ggplot2_3.3.6          tidyverse_1.3.1       
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] backports_1.4.1     igraph_1.3.4        splines_4.2.2      
-##  [4] listenv_0.9.0       TH.data_1.1-1       digest_0.6.29      
-##  [7] htmltools_0.5.4     fansi_1.0.3         magrittr_2.0.3     
-## [10] memoise_2.0.1       base64url_1.4       cluster_2.1.4      
-## [13] tzdb_0.3.0          globals_0.16.2      modelr_0.1.8       
-## [16] sandwich_3.0-2      colorspace_2.1-0    rvest_1.0.3        
-## [19] haven_2.5.1         xfun_0.31           callr_3.7.0        
-## [22] crayon_1.5.1        jsonlite_1.8.0      survival_3.4-0     
-## [25] MatrixModels_0.5-1  abind_1.4-5         SparseM_1.81       
-## [28] mvtnorm_1.1-3       DBI_1.1.3           rstatix_0.7.2      
-## [31] Rcpp_1.0.9          xtable_1.8-4        httr_1.4.4         
-## [34] ellipsis_0.3.2      pkgconfig_2.0.3     farver_2.1.1       
-## [37] sass_0.4.1          dbplyr_2.2.1        utf8_1.2.2         
-## [40] tidyselect_1.1.2    labeling_0.4.2      rlang_1.0.5        
-## [43] munsell_0.5.0       cellranger_1.1.0    tools_4.2.2        
-## [46] cachem_1.0.7        cli_3.3.0           generics_0.1.3     
-## [49] evaluate_0.16       fastmap_1.1.0       yaml_2.3.5         
-## [52] processx_3.7.0      knitr_1.40          fs_1.5.2           
-## [55] future_1.32.0       nlme_3.1-159        quantreg_5.94      
-## [58] xml2_1.3.3          compiler_4.2.2      rstudioapi_0.13    
-## [61] ggsignif_0.6.4      reprex_2.0.1        bslib_0.3.1        
-## [64] stringi_1.7.8       highr_0.9           ps_1.7.1           
-## [67] nloptr_2.0.3        vctrs_0.4.1.9000    pillar_1.8.1       
-## [70] lifecycle_1.0.2     furrr_0.3.1         BiocManager_1.30.18
-## [73] jquerylib_0.1.4     estimability_1.4.1  data.table_1.14.2  
-## [76] insight_0.18.2      R6_2.5.1            bookdown_0.28      
-## [79] renv_0.15.5         parallelly_1.34.0   codetools_0.2-19   
-## [82] boot_1.3-28.1       MASS_7.3-58.1       assertthat_0.2.1   
-## [85] rprojroot_2.0.2     withr_2.5.0         multcomp_1.4-23    
-## [88] mgcv_1.8-42         parallel_4.2.2      hms_1.1.2          
-## [91] grid_4.2.2          coda_0.19-4         minqa_1.2.5        
-## [94] snakecase_0.11.0    git2r_0.30.1</code></pre>
+##  [1] TH.data_1.1-1      minqa_1.2.5        colorspace_2.1-0   ggsignif_0.6.4    
+##  [5] ellipsis_0.3.2     rprojroot_2.0.2    estimability_1.4.1 fs_1.5.2          
+##  [9] rstudioapi_0.13    ggpubr_0.4.0       farver_2.1.1       MatrixModels_0.5-1
+## [13] ggrepel_0.9.1      mvtnorm_1.1-3      fansi_1.0.3        lubridate_1.8.0   
+## [17] xml2_1.3.3         codetools_0.2-19   splines_4.2.2      knitr_1.40        
+## [21] jsonlite_1.8.0     nloptr_2.0.3       cluster_2.1.4      dbplyr_2.2.1      
+## [25] compiler_4.2.2     httr_1.4.4         backports_1.4.1    assertthat_0.2.1  
+## [29] fastmap_1.1.0      cli_3.3.0          htmltools_0.5.4    quantreg_5.94     
+## [33] tools_4.2.2        igraph_1.3.4       coda_0.19-4        gtable_0.3.1      
+## [37] glue_1.6.2         Rcpp_1.0.9         cellranger_1.1.0   jquerylib_0.1.4   
+## [41] vctrs_0.4.1.9000   nlme_3.1-159       xfun_0.31          ps_1.7.1          
+## [45] rvest_1.0.3        lifecycle_1.0.2    rstatix_0.7.2      MASS_7.3-58.1     
+## [49] scales_1.2.1       hms_1.1.2          sandwich_3.0-2     parallel_4.2.2    
+## [53] SparseM_1.81       yaml_2.3.5         ggpmisc_0.5.0      sass_0.4.1        
+## [57] stringi_1.7.8      highr_0.9          ggpp_0.4.4         boot_1.3-28.1     
+## [61] rlang_1.0.5        pkgconfig_2.0.3    evaluate_0.16      labeling_0.4.2    
+## [65] processx_3.7.0     tidyselect_1.1.2   here_1.0.1         magrittr_2.0.3    
+## [69] bookdown_0.28      R6_2.5.1           generics_0.1.3     multcomp_1.4-23   
+## [73] base64url_1.4      DBI_1.1.3          pillar_1.8.1       haven_2.5.1       
+## [77] withr_2.5.0        mgcv_1.8-42        survival_3.4-0     abind_1.4-5       
+## [81] modelr_0.1.8       crayon_1.5.1       utf8_1.2.2         tzdb_0.3.0        
+## [85] rmarkdown_2.14     grid_4.2.2         readxl_1.4.0       data.table_1.14.2 
+## [89] git2r_0.30.1       callr_3.7.0        reprex_2.0.1       digest_0.6.29     
+## [93] xtable_1.8-4       munsell_0.5.0      bslib_0.3.1</code></pre>
 </details>
 </div>
 

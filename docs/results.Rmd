@@ -143,9 +143,24 @@ So `jul_herbivory` is small mammal herbivory and `late_herbivory` is just the in
 
 ## Results
 
-### Kale
+### Multivariate (plot)
 
-#### Multivariate
+```{r rda}
+#| fig.height: 8
+#| fig.width: 6.5
+#| fig.cap: "Redundancy analysis (RDA) correlation plots (a, c, e) and score plots (b,d,f) for kale (a,b), beans (c,d), and oats (e,f).  In the correlation plots, greyed out arrows respresent nutrients that have a correlation < 0.5 to either axis."
+rda_plot
+```
+
+The first constrained component (the one that explains most of the variation due to predictors) explains about **61%** of the variation explained by the predictors (less if you'd rather report the total variation in nutrients explained) (Figure \@ref(fig:rda)a,b).
+This axis is negatively correlated with Fe, Cu, K, Al, etc (Figure \@ref(fig:rda)a).
+Separation by historical and current treatment is minimal in the score plot (Figure \@ref(fig:rda)b).
+Might be separation due to herbivory (not plotted)?
+**note that none of the variables are over the 0.5 correlation threshold (i.e. all the arrows in** \@ref(fig:rda)**a are grey)**
+
+### Multivariate (Table 3)
+
+#### Kale
 
 ```{r}
 MVA.synt(kale_rda)
@@ -161,58 +176,15 @@ anova(kale_rda, permutations = 1000)
 
 An omnibus permutation test shows that the overall RDA is significant ($F = 2.16$, $p = 0.002$).
 
+Marginal effects test:
+
 ```{r}
 MVA.anova(kale_rda, permutations = 1000)
 ```
 
 Historical treatment, current treatment, and early herbivory all significantly affected nutrients.
 
-```{r}
-#|  rda, fig.height=8, fig.width=6.5,
-#|  fig.cap="Redundancy analysis (RDA) correlation plots (a, c, e) and score
-#|    plots (b,d,f) for kale (a,b), beans (c,d), and oats (e,f).  In the correlation
-#|    plots, greyed out arrows respresent nutrients that have a correlation < 0.5 to
-#|    either axis."
-rda_plot
-```
-
-The first constrained component (the one that explains most of the variation due to predictors) explains about **61%** of the variation explained by the predictors (less if you'd rather report the total variation in nutrients explained) (Figure \@ref(fig:rda)a,b).
-This axis is negatively correlated with Fe, Cu, K, Al, etc (Figure \@ref(fig:rda)a).
-Separation by historical and current treatment is minimal in the score plot (Figure \@ref(fig:rda)b).
-Might be separation due to herbivory (not plotted)?
-**note that none of the variables are over the 0.5 correlation threshold (i.e. all the arrows in** \@ref(fig:rda)**a are grey)**
-
-#### Univariate
-
-Boxplot
-
-![](figs/kale_boxplot.png)
-
-ANOVAs
-
-```{r}
-# fit all the linear models
-kale_lms <- list(
-  Fe = lm(log(fe) ~ historical + current + jul_herbivory + house, data = kale_nutr),
-  N  = lm(log(n)  ~ historical + current + jul_herbivory + house, data = kale_nutr),
-  Mg = lm(log(mg) ~ historical + current + jul_herbivory + house, data = kale_nutr),
-  Ca = lm(log(ca) ~ historical + current + jul_herbivory + house, data = kale_nutr),
-  K  = lm(log(k)  ~ historical + current + jul_herbivory + house, data = kale_nutr)
-)
-```
-
-I'm not going to adjust p-values *within* each ANOVA, but just keep in mind it's a lot of p-values, so Type I error might be high.
-
-```{r}
-kale_anovas <-
-  kale_lms %>%
-  map(~Anova(.x), .id = "nutrient")
-kale_anovas
-```
-
-### Beans
-
-#### Multivariate
+#### Beans
 
 ```{r}
 MVA.synt(bean_rda)
@@ -232,35 +204,6 @@ MVA.anova(bean_rda, permutations = 1000)
 
 -   Only current treatment significant.
 -   Figure \@ref(fig:rda)c,d
-
-#### Univariate
-
-Boxplot
-
-![](figs/bean_boxplot.png)
-
-ANOVAs
-
-```{r}
-# fit all the linear models
-bean_lms <- 
-  list(
-    "Fe" = lm(log(fe)~ historical + current + jul_herbivory + house, data = bean_nutr),
-    "N"  = lm(log(n) ~ historical + current + jul_herbivory + house, data = bean_nutr),
-    "Mg" = lm(log(mg)~ historical + current + jul_herbivory + house, data = bean_nutr),
-    "Ca" = lm(log(ca)~ historical + current + jul_herbivory + house, data = bean_nutr),
-    "K"  = lm(log(k) ~ historical + current + jul_herbivory + house, data = bean_nutr)
-  )
-```
-
-```{r}
-bean_anovas <- 
-  bean_lms %>% 
-  map(~Anova(.x), .id = "nutrient")
-bean_anovas
-```
-
-### Oats
 
 #### Multivariate
 
@@ -285,13 +228,87 @@ MVA.anova(oat_rda, permutations = 1000)
 -   Only current treatment is significant
 -   Figure \@ref(fig:rda)e,f
 
-#### Univariate
+### Univariate (boxplots)
 
-Boxplot
+**Kale**
+![](figs/kale_boxplot.png)
+
+**Beans**
+
+![](figs/bean_boxplot.png)
+
+**Oats**
 
 ![](figs/oat_boxplot.png)
 
-ANOVAs
+### Univariate (Table 4)
+
+Univariate ANOVAs for each nutrient of interest. I'm not going to adjust p-values *within* each ANOVA, but just keep in mind it's a lot of p-values, so Type I error might be high.
+
+#### Kale
+
+```{r}
+# fit all the linear models
+kale_lms <- list(
+  Fe = lm(log(fe) ~ historical + current + jul_herbivory + house, data = kale_nutr),
+  N  = lm(log(n)  ~ historical + current + jul_herbivory + house, data = kale_nutr),
+  Mg = lm(log(mg) ~ historical + current + jul_herbivory + house, data = kale_nutr),
+  Ca = lm(log(ca) ~ historical + current + jul_herbivory + house, data = kale_nutr),
+  K  = lm(log(k)  ~ historical + current + jul_herbivory + house, data = kale_nutr)
+)
+```
+
+
+
+```{r}
+kale_anovas <-
+  kale_lms %>%
+  map(~Anova(.x), .id = "nutrient")
+
+kale_anovas |>
+  map({
+    \(x) tidy(x) |> 
+      select(-sumsq) |> 
+      rename("F" = "statistic") |> 
+      pivot_longer(-term) |> 
+      mutate(value = round(value, 3)) |> 
+      pivot_wider(names_from = term, values_from = value)
+  }) |> 
+  bind_rows(.id = "Nutrient")
+```
+
+#### Beans
+
+```{r}
+# fit all the linear models
+bean_lms <- 
+  list(
+    "Fe" = lm(log(fe)~ historical + current + jul_herbivory + house, data = bean_nutr),
+    "N"  = lm(log(n) ~ historical + current + jul_herbivory + house, data = bean_nutr),
+    "Mg" = lm(log(mg)~ historical + current + jul_herbivory + house, data = bean_nutr),
+    "Ca" = lm(log(ca)~ historical + current + jul_herbivory + house, data = bean_nutr),
+    "K"  = lm(log(k) ~ historical + current + jul_herbivory + house, data = bean_nutr)
+  )
+```
+
+```{r}
+bean_anovas <- 
+  bean_lms %>% 
+  map(~Anova(.x), .id = "nutrient")
+
+bean_anovas |>
+  map({
+    \(x) tidy(x) |> 
+      select(-sumsq) |> 
+      rename("F" = "statistic") |> 
+      pivot_longer(-term) |> 
+      mutate(value = round(value, 3)) |> 
+      pivot_wider(names_from = term, values_from = value)
+  }) |> 
+  bind_rows(.id = "Nutrient")
+```
+
+#### Oats
 
 ```{r}
 # fit all the linear models
@@ -309,7 +326,17 @@ oat_lms <-
 oat_anovas <- 
   oat_lms %>% 
   map(~Anova(.x), .id = "nutrient")
-oat_anovas
+
+oat_anovas |>
+  map({
+    \(x) tidy(x) |> 
+      select(-sumsq) |> 
+      rename("F" = "statistic") |> 
+      pivot_longer(-term) |> 
+      mutate(value = round(value, 3)) |> 
+      pivot_wider(names_from = term, values_from = value)
+  }) |> 
+  bind_rows(.id = "Nutrient")
 ```
 
 ## Effects of Herbivory on Nutrients

@@ -7,6 +7,18 @@ authors:
   - family-names: "Scott"
     given-names: "Eric R."
     orcid: "https://orcid.org/0000-0002-7430-7879"
+  - family-names: "Jackson"
+    given-names: "Erin Donley"
+  - family-names: "Casolaro"
+    given-names: "Christian"
+  - family-names: "Nebeker"
+    given-names: "Ryan S."
+  - family-names: "Dukes"
+    given-names: "Jeffrey S."
+  - family-names: "Griffin"
+    given-names: "Timothy"
+  - family-names: "Orians"
+    given-names: "Colin M."
 doi: 10.5281/zenodo.6478160
 url: "https://github.com/Aariq/BACE-legacy-effects"
 date-released: 2023-02-17

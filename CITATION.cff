@@ -1,5 +1,8 @@
 cff-version: 1.2.0
-message: "If you use this code or data, please cite it as below"
+message: "If you use this code or data, please cite the data archive and the published paper"
+title: "Code and Data from: Current and Legacy Effects of Precipitation Treatments on Growth and Nutrition in Contrasting Crops"
+type: software
+version: v1.0
 authors:
   - family-names: "Scott"
     given-names: "Eric R."
@@ -16,8 +19,29 @@ authors:
     given-names: "Timothy"
   - family-names: "Orians"
     given-names: "Colin M."
-title: "Code and Data from: Current and Legacy Effects of Precipitation Treatments on Growth and Nutrition in Contrasting Crops"
-version: v1.0
 doi: 10.5281/zenodo.6478160
 url: "https://github.com/Aariq/BACE-legacy-effects"
 date-released: 2023-02-17
+preferred-citation:
+  type: article
+  title: "Current and legacy effects of precipitation treatments on growth and nutrition in contrasting crops"
+  authors:
+    - family-names: "Jackson"
+      given-names: "Erin Donley"
+    - family-names: "Casolaro"
+      given-names: "Christian"
+    - family-names: "Nebeker"
+      given-names: "Ryan S."
+    - family-names: "Scott"
+      given-names: "Eric R."
+      orcid: "https://orcid.org/0000-0002-7430-7879"
+    - family-names: "Dukes"
+      given-names: "Jeffrey S."
+    - family-names: "Griffin"
+      given-names: "Timothy"
+    - family-names: "Orians"
+      given-names: "Colin M."
+  journal: "Agriculture, Ecosystems & Environment"
+  volume: 352
+  year: 2023
+  doi: 10.1016/j.agee.2023.108513

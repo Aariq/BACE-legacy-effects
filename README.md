@@ -1,7 +1,8 @@
 # BACE-legacy-effects
 
 <!-- badges: start -->
-[![DOI](https://zenodo.org/badge/370156054.svg)](https://zenodo.org/badge/latestdoi/370156054)
+[![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.agee.2023.108513-blue)](https://doi.org/10.1016/j.agee.2023.108513)
+[![code](https://zenodo.org/badge/370156054.svg)](https://zenodo.org/badge/latestdoi/370156054)
 
 <!-- badges: end -->
 
